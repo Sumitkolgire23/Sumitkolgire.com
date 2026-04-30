@@ -1,0 +1,604 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════
+   WABI-SABI DESIGN SYSTEM — Neural Parchment Edition
+   Core philosophy: imperfection-as-intention. Silence as design.
+   Tech accents are subtle — the site is a researcher's notebook.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── CSS CUSTOM PROPERTIES ─────────────────────────────── */
+:root {
+  /* Parchment tones */
+  --ink:        #1c1a15;
+  --ink-2:      #2c2925;
+  --ink-light:  #3d3830;
+  --muted:      #6b6558;
+  --ghost:      #9b9284;
+  --paper:      #f7f3ec;
+  --paper-2:    #f0ebe0;
+  --paper-3:    #e8e0d0;
+  --washi:      #ede8dc;
+
+  /* Accent colors */
+  --seal:       #c41e3a; /* primary accent — featured, links */
+  --gold:       #8b7355;
+  --gold-warm:  #c8a96e;
+  --moss:       #2d6a4f;
+
+  /* Neural Parchment — subtle tech accent for AI/research content only */
+  --teal:       #0d9488;
+  --teal-light: rgba(13, 148, 136, 0.12);
+
+  /* Status + UI */
+  --warn:       #b45309;
+  --danger:     #b91c1c;
+  --ok:         #15803d;
+
+  /* Typography */
+  --serif:    var(--font-libre), Georgia, serif;
+  --display:  var(--font-shippori), Georgia, serif;
+  --mono:     var(--font-dm-mono), "Courier New", monospace;
+  --sans:     var(--font-inter), system-ui, sans-serif;
+
+  /* Spacing */
+  --content-width: 75ch;
+  --site-width: 1100px;
+
+  /* Convenience aliases used by components */
+  --ink-faint:   rgba(28, 26, 21, 0.12); /* border, subtle strokes      */
+  --ink-mid:     #6b6558;                /* secondary text (= --muted)  */
+  --paper-light: #f0ebe0;                /* card backgrounds (= --paper-2) */
+  --cyan:        #0d9488;                /* AI/tech tag accent (= --teal) */
+}
+
+/* ── BASE RESET ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 15px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ── BODY + RULED PAPER BACKGROUND ─────────────────────── */
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.75;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/*
+  Wabi-sabi: ruled paper lines as background texture.
+  Uses CSS gradient — no image, zero performance cost.
+*/
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(139, 115, 85, 0.055) 28px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SELECTION ─────────────────────────────────────────── */
+::selection {
+  background: rgba(196, 30, 58, 0.15);
+  color: var(--ink);
+}
+
+/* ── TYPOGRAPHY ────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--serif);
+  color: var(--ink);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); }
+h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
+h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); }
+
+p { color: var(--ink-2); }
+
+a {
+  color: var(--seal);
+  text-decoration: underline;
+  text-decoration-color: rgba(196, 30, 58, 0.3);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s;
+}
+
+a:hover {
+  text-decoration-color: var(--seal);
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: var(--paper-3);
+  padding: 0.1em 0.35em;
+  border: 1px solid rgba(139, 115, 85, 0.2);
+}
+
+pre {
+  background: var(--ink) !important;
+  color: rgba(247, 243, 236, 0.88);
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  line-height: 1.75;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  border: none;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ── INK READING PROGRESS BAR ──────────────────────────── */
+/*
+  1px brush-stroke fill at top of viewport.
+  Controlled via JS: element.style.setProperty('--progress', percentage + '%')
+  scaleX transform — zero layout reflow.
+*/
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: transparent;
+  z-index: 100;
+  transform-origin: left;
+}
+
+.reading-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: transform 0.05s linear;
+}
+
+/* ── DROP CAP ───────────────────────────────────────────── */
+/*
+  Large serif first letter on article opening paragraph.
+  No plugin needed — pure CSS.
+*/
+.prose-drop-cap > p:first-of-type::first-letter {
+  font-family: var(--serif);
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 0.75;
+  float: left;
+  margin-right: 0.08em;
+  margin-top: 0.06em;
+  color: var(--ink);
+}
+
+/* ── WABI SECTION DIVIDER ───────────────────────────────── */
+.ink-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(139, 115, 85, 0.35) 15%,
+    rgba(139, 115, 85, 0.35) 85%,
+    transparent
+  );
+  margin: 2rem 0;
+}
+
+/* ── SEAL STAMP ─────────────────────────────────────────── */
+.seal-stamp {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid var(--seal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--seal);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* ── STATUS BADGES (Neural Parchment — very subtle) ─────── */
+/*
+  Used only on project cards to show build status.
+  Text-based, no glowing effects — wabi restraint.
+*/
+.status-active {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--teal);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.status-building {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--gold-warm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.status-completed {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--ghost);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* AI/Research tag color — teal accent (subtle, not dominant) */
+.tag-ai,
+.tag-research,
+.tag-ml {
+  color: var(--teal);
+  border-color: rgba(13, 148, 136, 0.25);
+  background: var(--teal-light);
+}
+
+/* ── ANIMATIONS ─────────────────────────────────────────── */
+@keyframes ink-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ink-slide-in {
+  from { opacity: 0; clipPath: inset(0 100% 0 0); }
+  to   { opacity: 1; clipPath: inset(0 0% 0 0); }
+}
+
+.animate-ink-fade {
+  animation: ink-fade-in 0.45s ease-out forwards;
+}
+
+/* Staggered children */
+.stagger-children > * {
+  opacity: 0;
+  animation: ink-fade-in 0.45s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+
+/* ── PAGE TRANSITIONS ──────────────────────────────────── */
+/*
+  Wabi-sabi: opacity fade only. Never slide or scale.
+  Stillness is the aesthetic.
+*/
+.page-transition {
+  animation: ink-fade-in 0.3s ease-out forwards;
+}
+
+/* ── SCROLLBAR ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper-2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 115, 85, 0.3);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 115, 85, 0.5);
+}
+
+/* ── FOCUS STYLES ──────────────────────────────────────── */
+:focus-visible {
+  outline: 1.5px solid var(--seal);
+  outline-offset: 2px;
+}
+
+/* ── SIDENOTES (Tufte-style) ────────────────────────────── */
+/* Only activated at 1200px+ viewport */
+@media (min-width: 1200px) {
+  .has-sidenotes {
+    position: relative;
+  }
+  
+  .sidenote {
+    position: absolute;
+    right: -280px;
+    width: 240px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.55;
+    font-family: var(--sans);
+  }
+}
+
+@media (max-width: 1199px) {
+  .sidenote {
+    display: block;
+    margin: 0.5rem 0 0.5rem 1.5rem;
+    padding: 0.5rem 0 0.5rem 0.75rem;
+    border-left: 2px solid rgba(139, 115, 85, 0.2);
+    font-size: 0.825rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+}
+
+/* ── PROSE CONTENT ─────────────────────────────────────── */
+.prose-wabi {
+  max-width: var(--content-width);
+  color: var(--ink-2);
+  line-height: 1.85;
+}
+
+.prose-wabi h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.12);
+}
+
+.prose-wabi h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-wabi p {
+  margin-bottom: 1.25rem;
+}
+
+.prose-wabi ul, .prose-wabi ol {
+  margin: 0.75rem 0 1.25rem 1.5rem;
+}
+
+.prose-wabi li {
+  margin-bottom: 0.35rem;
+}
+
+.prose-wabi blockquote {
+  border-left: 2px solid var(--seal);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── RESPONSIVE BREAKPOINTS ─────────────────────────────── */
+/*
+  Breakpoints:
+  mobile  : < 640px
+  tablet  : 640px – 1023px
+  laptop  : 1024px – 1279px
+  desktop : ≥ 1280px
+*/
+
+/* Hidden on mobile, visible on tablet+ */
+.hidden-mobile {
+  display: none !important;
+}
+@media (min-width: 640px) {
+  .hidden-mobile {
+    display: flex !important;
+  }
+}
+
+/* Visible on mobile only */
+.show-mobile {
+  display: flex !important;
+}
+@media (min-width: 640px) {
+  .show-mobile {
+    display: none !important;
+  }
+}
+
+/* Responsive grid: 1 col mobile → 2 col tablet → 3 col desktop */
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .grid-responsive-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 2-column on tablet+ */
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── RESPONSIVE TYPOGRAPHY ──────────────────────────────── */
+/* Hero headings scale down on mobile */
+@media (max-width: 639px) {
+  .hero-name {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+}
+
+/* ── RESPONSIVE PADDING ─────────────────────────────────── */
+.page-section {
+  padding: 3rem 1.25rem;
+}
+@media (min-width: 640px) {
+  .page-section {
+    padding: 4rem 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .page-section {
+    padding: 5rem 1.5rem;
+  }
+}
+
+/* Section container, max-width centered */
+.section-container {
+  max-width: var(--site-width);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── INTERACTIVE HOVER STATES ───────────────────────────── */
+.footer-link:hover {
+  color: rgba(247, 243, 236, 0.9) !important;
+}
+
+a:not([class]):hover {
+  color: var(--seal);
+}
+
+/* ── PROSE WABI — MDX article body typography ───────────── */
+.prose-wabi {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  line-height: 1.8;
+  max-width: var(--content-width);
+}
+.prose-wabi p {
+  margin: 1.4em 0;
+}
+.prose-wabi h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 2.5em 0 0.75em;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--ink-faint);
+}
+.prose-wabi h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 2em 0 0.5em;
+  line-height: 1.25;
+}
+.prose-wabi h4 {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-mid);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 1.75em 0 0.5em;
+}
+.prose-wabi strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.prose-wabi em {
+  font-style: italic;
+  color: var(--ink-2);
+}
+.prose-wabi a {
+  color: var(--seal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: opacity 0.15s;
+}
+.prose-wabi a:hover {
+  opacity: 0.75;
+}
+.prose-wabi blockquote {
+  border-left: 3px solid var(--ink-faint);
+  padding: 0.5em 0 0.5em 1.5em;
+  margin: 2em 0;
+  font-style: italic;
+  color: var(--ink-mid);
+}
+.prose-wabi code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--paper-2);
+  padding: 0.15em 0.4em;
+  border-radius: 2px;
+  color: var(--ink);
+}
+.prose-wabi pre {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1.25em 1.5em;
+  border-radius: 3px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 2em 0;
+}
+.prose-wabi pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.prose-wabi ul,
+.prose-wabi ol {
+  padding-left: 1.5em;
+  margin: 1.25em 0;
+}
+.prose-wabi li {
+  margin: 0.4em 0;
+}
+.prose-wabi ul li::marker {
+  color: var(--seal);
+}
+.prose-wabi ol li::marker {
+  color: var(--ink-mid);
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+.prose-wabi hr {
+  border: none;
+  border-top: 1px solid var(--ink-faint);
+  margin: 2.5em 0;
+}
+.prose-wabi img {
+  max-width: 100%;
+  border-radius: 2px;
+}
