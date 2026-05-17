@@ -41,7 +41,7 @@ export default function DocsPage() {
                 <OffsetShadowCard key={doc.slug} href={`/docs/${doc.slug.split("/").pop()}`}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.5rem" }}>
                     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {doc.tags.slice(0, 3).map((tag) => (
+                      {doc.tags.slice(0, 3).map((tag: string) => (
                         <span key={tag} style={{ fontFamily: "var(--mono)", fontSize: "0.62rem", letterSpacing: "0.08em", color: "var(--teal)", textTransform: "uppercase" }}>
                           {tag}
                         </span>

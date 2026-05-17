@@ -1,31 +1,32 @@
 import type { Metadata } from "next";
-import { Libre_Baskerville, DM_Mono, Inter } from "next/font/google";
+import { Instrument_Serif, Geist_Mono, Geist } from "next/font/google";
 import "@/app/globals.css";
 import { SiteNavbar } from "@/components/layout/SiteNavbar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { DarkPageEffects } from "@/components/layout/DarkPageEffects";
 
 // ── FONTS ─────────────────────────────────────────────────
 // Self-hosted via next/font — zero FOUT, zero CLS
 
-const libreBaskerville = Libre_Baskerville({
-  weight: ["400", "700"],
+const instrumentSerif = Instrument_Serif({
+  weight: ["400"],
   style: ["normal", "italic"],
   subsets: ["latin"],
-  variable: "--font-libre",
+  variable: "--font-libre", // reuse existing var so prose-wabi still works
   display: "swap",
 });
 
-const dmMono = DM_Mono({
+const geistMono = Geist_Mono({
   weight: ["300", "400", "500"],
   subsets: ["latin"],
-  variable: "--font-dm-mono",
+  variable: "--font-dm-mono", // reuse existing var
   display: "swap",
 });
 
-const inter = Inter({
-  weight: ["400", "500", "600"],
+const geist = Geist({
+  weight: ["300", "400", "500", "600"],
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-inter", // reuse existing var
   display: "swap",
 });
 
@@ -77,9 +78,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${libreBaskerville.variable} ${dmMono.variable} ${inter.variable}`}
+      className={`${instrumentSerif.variable} ${geistMono.variable} ${geist.variable}`}
     >
       <body className="antialiased">
+        <DarkPageEffects />
         <SiteNavbar />
         <main id="main-content" tabIndex={-1}>
           {children}

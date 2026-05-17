@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { SECTION_TYPE_MAP } from "../../actions";
+import { SECTION_TYPE_MAP } from "../../constants";
+
 
 export default async function NewEntryPage({
   params,

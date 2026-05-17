@@ -3,14 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
-
-export const SECTION_TYPE_MAP: Record<string, string> = {
-  diary:    "log",
-  research: "research",
-  ideas:    "idea",
-  reading:  "reference",
-  projects: "experiment",
-};
+import { SECTION_TYPE_MAP } from "./constants";
 
 async function getAuthClient() {
   const cookieStore = await cookies();
@@ -36,6 +29,39 @@ export async function createLabEntry(section: string): Promise<{ id: string } | 
       console.error("[createLabEntry]", error?.message);
       return { error: "Failed to create entry." };
     }
+    return { id: data.id };
+  } catch {
+    return { error: "Unauthorized" };
+  }
+}
+
+/** Import an external paper (e.g., from arXiv) */
+export async function importResearchEntry(payload: {
+  title: string;
+  url?: string;
+  type: "pdf" | "arxiv";
+}): Promise<{ id: string } | { error: string }> {
+  try {
+    const { supabase, user } = await getAuthClient();
+
+    const { data, error } = await supabase
+      .from("lab_entries")
+      .insert({
+        user_id: user.id,
+        type: "research",
+        title: payload.title,
+        content: payload.url ? { source_url: payload.url, import_type: payload.type } : { import_type: payload.type },
+        tags: [payload.type],
+      })
+      .select("id")
+      .single();
+
+    if (error || !data) {
+      console.error("[importResearchEntry]", error?.message);
+      return { error: "Failed to import entry." };
+    }
+    
+    revalidatePath("/lab/research");
     return { id: data.id };
   } catch {
     return { error: "Unauthorized" };
@@ -105,5 +131,60 @@ export async function deleteLabEntry(id: string): Promise<{ ok: boolean }> {
     return { ok: true };
   } catch {
     return { ok: false };
+  }
+}
+
+/** Ripeness ladder for the Ideas Wall */
+const RIPENESS_LADDER = ["seed", "sprout", "ripe", "published"] as const;
+type Ripeness = (typeof RIPENESS_LADDER)[number];
+
+/**
+ * Promote an idea to the next ripeness level.
+ * Returns { nextRipeness } on success so the client can update optimistically.
+ */
+export async function promoteIdea(
+  id: string,
+  currentRipeness: string,
+): Promise<{ nextRipeness: Ripeness } | { error: string }> {
+  try {
+    const { supabase, user } = await getAuthClient();
+
+    const currentIdx = RIPENESS_LADDER.indexOf(currentRipeness as Ripeness);
+    if (currentIdx === -1 || currentIdx === RIPENESS_LADDER.length - 1) {
+      return { error: "Already at max ripeness." };
+    }
+    const nextRipeness = RIPENESS_LADDER[currentIdx + 1];
+
+    // Fetch current tags so we only swap out the ripeness tag, preserving others
+    const { data: entry, error: fetchError } = await supabase
+      .from("lab_entries")
+      .select("tags")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (fetchError || !entry) return { error: "Entry not found." };
+
+    const existingTags: string[] = Array.isArray(entry.tags) ? entry.tags : [];
+    const updatedTags = [
+      ...existingTags.filter((t) => !RIPENESS_LADDER.includes(t as Ripeness)),
+      nextRipeness,
+    ];
+
+    const { error: updateError } = await supabase
+      .from("lab_entries")
+      .update({ tags: updatedTags })
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (updateError) {
+      console.error("[promoteIdea]", updateError.message);
+      return { error: "Failed to promote idea." };
+    }
+
+    revalidatePath("/lab/ideas");
+    return { nextRipeness };
+  } catch {
+    return { error: "Unauthorized" };
   }
 }

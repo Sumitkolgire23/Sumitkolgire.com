@@ -58,7 +58,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             {/* Tech stack */}
             {project.stack && project.stack.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "1.25rem" }}>
-                {project.stack.map((tech) => (
+                {project.stack.map((tech: string) => (
                   <span key={tech} style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", letterSpacing: "0.06em", color: "var(--teal)", border: "1px solid var(--teal-light)", padding: "0.15rem 0.5rem", background: "var(--teal-light)" }}>
                     {tech}
                   </span>

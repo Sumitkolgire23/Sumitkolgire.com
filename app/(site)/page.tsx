@@ -325,7 +325,7 @@ export default function HomePage() {
                     }}
                   >
                     <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
-                      {article.tags.slice(0, 2).map((tag) => (
+                      {article.tags.slice(0, 2).map((tag: string) => (
                         <span
                           key={tag}
                           style={{
@@ -448,7 +448,7 @@ export default function HomePage() {
 
                   {/* Stack tags */}
                   <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
-                    {project.stack.slice(0, 3).map((tech) => (
+                    {project.stack.slice(0, 3).map((tech: string) => (
                       <span
                         key={tech}
                         style={{

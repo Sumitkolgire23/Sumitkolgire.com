@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { SealStamp } from "@/components/wabi/SealStamp";
 
 const NAV_LINKS = [
-  { href: "/articles",     label: "Writing"     },
+  { href: "/articles",     label: "Writing"      },
   { href: "/perspectives", label: "Perspectives" },
-  { href: "/projects",     label: "Projects"    },
-  { href: "/docs",         label: "Docs"        },
-  { href: "/resources",    label: "Resources"   },
-  { href: "/about",        label: "About"       },
+  { href: "/projects",     label: "Projects"     },
+  { href: "/docs",         label: "Docs"         },
+  { href: "/resources",    label: "Resources"    },
+  { href: "/about",        label: "About"        },
 ];
 
 export function SiteNavbar() {
@@ -25,7 +24,6 @@ export function SiteNavbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => setMobileOpen(false), [pathname]);
 
   return (
@@ -33,132 +31,143 @@ export function SiteNavbar() {
       <header
         id="site-navbar"
         style={{
-          position: "sticky",
+          position: "fixed",
           top: 0,
-          zIndex: 50,
-          background: scrolled ? "rgba(247,243,236,0.92)" : "transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          borderBottom: scrolled ? "1px solid var(--ink-faint)" : "1px solid transparent",
-          transition: "background 0.3s, backdrop-filter 0.3s, border-color 0.3s",
+          left: 0,
+          right: 0,
+          zIndex: 500,
+          height: scrolled ? "48px" : "54px",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 40px",
+          justifyContent: "space-between",
+          background: "rgba(13, 13, 14, 0.88)",
+          backdropFilter: "blur(14px)",
+          borderBottom: "1px solid #242428",
+          transition: "height 0.3s",
         }}
       >
-        <nav
+        {/* Logo */}
+        <Link
+          href="/"
+          aria-label="Sumit Kolgire — Home"
           style={{
-            maxWidth: "var(--site-width)",
-            margin: "0 auto",
-            padding: "0 1.5rem",
-            height: "3.75rem",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            gap: "12px",
+            textDecoration: "none",
           }}
         >
-          {/* Logo */}
+          {/* SVG seal */}
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style={{ flexShrink: 0, transition: "transform 0.4s" }}
+            onMouseEnter={e => (e.currentTarget.style.transform = "rotate(-12deg) scale(1.08)")}
+            onMouseLeave={e => (e.currentTarget.style.transform = "")}
+          >
+            <circle cx="16" cy="16" r="15" stroke="#c41e3a" strokeWidth="1"/>
+            <circle cx="16" cy="16" r="11.5" stroke="#c41e3a" strokeWidth="0.5"/>
+            <text fontFamily="'Instrument Serif',serif" fontSize="7" fill="#c41e3a" textAnchor="middle" x="16" y="13" fontStyle="italic">SK</text>
+            <text fontFamily="'Geist Mono',monospace" fontSize="4" fill="#c41e3a" textAnchor="middle" x="16" y="21" letterSpacing="1">LAB</text>
+          </svg>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+            <span style={{ fontFamily: "var(--mono)", fontSize: "12px", color: "var(--text)", letterSpacing: "0.05em" }}>
+              sumit kolgire
+            </span>
+            <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
+              AI / ML Engineer
+            </span>
+          </div>
+        </Link>
+
+        {/* Desktop nav links */}
+        <ul
+          role="list"
+          className="hidden-mobile"
+          style={{ display: "flex", alignItems: "center", gap: "4px", listStyle: "none", margin: 0, padding: 0 }}
+        >
+          {NAV_LINKS.map(({ href, label }) => {
+            const active = pathname.startsWith(href);
+            return (
+              <li key={href}>
+                <Link
+                  href={href}
+                  style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: "11px",
+                    color: active ? "var(--text)" : "var(--text3)",
+                    textDecoration: "none",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    letterSpacing: "0.06em",
+                    transition: "all 0.2s",
+                    background: active ? "var(--bg3)" : "transparent",
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.color = "var(--text)";
+                    (e.currentTarget as HTMLElement).style.background = "var(--bg3)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = active ? "var(--text)" : "var(--text3)";
+                    (e.currentTarget as HTMLElement).style.background = active ? "var(--bg3)" : "transparent";
+                  }}
+                >
+                  {label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Lab CTA + hamburger */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link
-            href="/"
-            aria-label="Sumit Kolgire — Home"
+            href="/lab"
+            className="hidden-mobile"
             style={{
-              fontFamily: "var(--serif)",
-              fontWeight: 700,
-              fontSize: "1.05rem",
-              color: "var(--ink)",
+              fontFamily: "var(--mono)",
+              fontSize: "10px",
+              color: "var(--seal)",
+              border: "1px solid rgba(196,30,58,.3)",
+              background: "var(--seal2)",
+              padding: "5px 14px",
+              borderRadius: "100px",
               textDecoration: "none",
-              letterSpacing: "-0.01em",
+              letterSpacing: "0.06em",
               display: "flex",
               alignItems: "center",
-              gap: "0.5rem",
+              gap: "6px",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.background = "rgba(196,30,58,.18)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(196,30,58,.5)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.background = "var(--seal2)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(196,30,58,.3)";
             }}
           >
-            <SealStamp size="sm" />
-            Sumit Kolgire
+            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "var(--seal)", animation: "blink 2s infinite", display: "inline-block" }} />
+            Enter lab
           </Link>
-
-          {/* Desktop nav links */}
-          <ul
-            role="list"
-            style={{
-              display: "flex",
-              gap: "0.25rem",
-              listStyle: "none",
-              margin: 0,
-              padding: 0,
-            }}
-            className="hidden-mobile"
-          >
-            {NAV_LINKS.map(({ href, label }) => {
-              const active = pathname.startsWith(href);
-              return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    style={{
-                      fontFamily: "var(--mono)",
-                      fontSize: "0.78rem",
-                      letterSpacing: "0.04em",
-                      color: active ? "var(--seal)" : "var(--ink-mid)",
-                      textDecoration: "none",
-                      padding: "0.4rem 0.7rem",
-                      borderBottom: active ? "1px solid var(--seal)" : "1px solid transparent",
-                      transition: "color 0.15s, border-color 0.15s",
-                    }}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
 
           {/* Mobile hamburger */}
           <button
             id="mobile-menu-toggle"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen ? true : false}
-            onClick={() => setMobileOpen((v) => !v)}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(v => !v)}
             className="show-mobile"
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "0.5rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-            }}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: "0.5rem", display: "flex", flexDirection: "column", gap: "5px" }}
           >
-            <span
-              style={{
-                display: "block",
-                width: "22px",
-                height: "1px",
-                background: "var(--ink)",
-                transition: "transform 0.2s",
-                transform: mobileOpen ? "translateY(6px) rotate(45deg)" : "none",
-              }}
-            />
-            <span
-              style={{
-                display: "block",
-                width: "22px",
-                height: "1px",
-                background: "var(--ink)",
-                opacity: mobileOpen ? 0 : 1,
-                transition: "opacity 0.2s",
-              }}
-            />
-            <span
-              style={{
-                display: "block",
-                width: "22px",
-                height: "1px",
-                background: "var(--ink)",
-                transition: "transform 0.2s",
-                transform: mobileOpen ? "translateY(-6px) rotate(-45deg)" : "none",
-              }}
-            />
+            <span style={{ display: "block", width: "22px", height: "1px", background: "var(--text)", transition: "transform 0.2s", transform: mobileOpen ? "translateY(6px) rotate(45deg)" : "none" }} />
+            <span style={{ display: "block", width: "22px", height: "1px", background: "var(--text)", opacity: mobileOpen ? 0 : 1, transition: "opacity 0.2s" }} />
+            <span style={{ display: "block", width: "22px", height: "1px", background: "var(--text)", transition: "transform 0.2s", transform: mobileOpen ? "translateY(-6px) rotate(-45deg)" : "none" }} />
           </button>
-        </nav>
+        </div>
       </header>
+
+      {/* Spacer so content doesn't hide under fixed nav */}
+      <div style={{ height: "54px" }} aria-hidden="true" />
 
       {/* Mobile drawer */}
       {mobileOpen && (
@@ -166,35 +175,32 @@ export function SiteNavbar() {
           id="mobile-menu"
           role="navigation"
           aria-label="Mobile navigation"
+          className="show-mobile"
           style={{
             position: "fixed",
-            top: "3.75rem",
+            top: "54px",
             left: 0,
             right: 0,
-            background: "var(--paper)",
-            borderBottom: "1px solid var(--ink-faint)",
+            background: "rgba(13,13,14,.96)",
+            backdropFilter: "blur(14px)",
+            borderBottom: "1px solid var(--border)",
             zIndex: 49,
             padding: "1rem 1.5rem 1.5rem",
           }}
-          className="show-mobile"
         >
           <ul role="list" style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {NAV_LINKS.map(({ href, label }) => (
               <li key={href}>
-                <Link
-                  href={href}
-                  style={{
-                    fontFamily: "var(--mono)",
-                    fontSize: "0.9rem",
-                    color: pathname.startsWith(href) ? "var(--seal)" : "var(--ink)",
-                    textDecoration: "none",
-                    letterSpacing: "0.04em",
-                  }}
-                >
+                <Link href={href} style={{ fontFamily: "var(--mono)", fontSize: "0.9rem", color: pathname.startsWith(href) ? "var(--seal)" : "var(--text)", textDecoration: "none", letterSpacing: "0.04em" }}>
                   {label}
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href="/lab" style={{ fontFamily: "var(--mono)", fontSize: "0.9rem", color: "var(--seal)", textDecoration: "none", letterSpacing: "0.04em" }}>
+                Enter lab →
+              </Link>
+            </li>
           </ul>
         </div>
       )}

@@ -24,7 +24,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
       <header className="page-section" style={{ paddingBottom: "2rem" }}>
         <div className="section-container" style={{ maxWidth: "var(--content-width)", margin: "0 auto" }}>
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
-            {doc.tags.map((tag) => (
+            {doc.tags.map((tag: string) => (
               <a key={tag} href={`/tags/${tag}`} style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "var(--teal)", textDecoration: "none", textTransform: "uppercase" }}>
                 {tag}
               </a>

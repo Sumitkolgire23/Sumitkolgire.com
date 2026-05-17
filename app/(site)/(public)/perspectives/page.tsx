@@ -56,7 +56,7 @@ export default function PerspectivesPage() {
                           CONTESTED
                         </span>
                       )}
-                      {pov.tags.slice(0, 3).map((tag) => (
+                      {pov.tags.slice(0, 3).map((tag: string) => (
                         <span key={tag} style={{ fontFamily: "var(--mono)", fontSize: "0.62rem", letterSpacing: "0.08em", color: "var(--ink-mid)", textTransform: "uppercase" }}>
                           {tag}
                         </span>

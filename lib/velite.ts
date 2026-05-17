@@ -35,7 +35,7 @@ export function getFeaturedArticles() {
 
 export function getRelatedArticles(slug: string, tags: string[], limit = 3) {
   return getArticles()
-    .filter((a) => a.slug !== slug && a.tags.some((t) => tags.includes(t)))
+    .filter((a) => a.slug !== slug && a.tags.some((t: string) => tags.includes(t)))
     .slice(0, limit);
 }
 
@@ -82,10 +82,10 @@ export { urlSlug };
 export function getAllTags() {
   const allTags = new Set<string>();
   
-  getArticles().forEach(a => a.tags.forEach(t => allTags.add(t)));
-  getPerspectives().forEach(p => p.tags.forEach(t => allTags.add(t)));
-  getProjects().forEach(p => p.tags.forEach(t => allTags.add(t)));
-  getDocs().forEach(d => d.tags.forEach(t => allTags.add(t)));
+  getArticles().forEach(a => a.tags.forEach((t: string) => allTags.add(t)));
+  getPerspectives().forEach(p => p.tags.forEach((t: string) => allTags.add(t)));
+  getProjects().forEach(p => p.tags.forEach((t: string) => allTags.add(t)));
+  getDocs().forEach(d => d.tags.forEach((t: string) => allTags.add(t)));
   
   return Array.from(allTags).sort();
 }

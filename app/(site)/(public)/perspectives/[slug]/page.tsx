@@ -36,7 +36,7 @@ export default async function PerspectivePage({ params }: { params: Promise<{ sl
                   CONTESTED
                 </span>
               )}
-              {pov.tags.map((tag) => (
+              {pov.tags.map((tag: string) => (
                 <a key={tag} href={`/tags/${tag}`} style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "var(--ink-mid)", textDecoration: "none", textTransform: "uppercase" }}>
                   {tag}
                 </a>

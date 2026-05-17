@@ -4,8 +4,11 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function loginAction(prevState: { error: string } | undefined, formData: FormData) {
-  const email = formData.get("email") as string;
+export async function loginAction(
+  prevState: { error: string } | undefined,
+  formData: FormData
+) {
+  const email    = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   if (!email || !password) {
@@ -13,16 +16,11 @@ export async function loginAction(prevState: { error: string } | undefined, form
   }
 
   const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
+  const supabase    = await createClient(cookieStore);
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    return { error: error.message };
-  }
+  if (error) return { error: error.message };
 
   redirect("/lab");
 }

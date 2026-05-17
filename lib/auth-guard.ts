@@ -1,28 +1,38 @@
-import { auth } from "@/lib/auth";
+"use server";
+
+import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
 
 /**
- * requireOwner — reusable guard for API routes
- * 
- * Throws a 401 Response if the request has no valid session with OWNER role.
- * Usage: const session = await requireOwner(); // throws if not authorized
+ * requireOwner — reusable guard for Server Actions and API routes.
+ *
+ * Throws a Response (401/403) if the request has no valid Supabase session.
+ * Usage: const user = await requireOwner();
  */
 export async function requireOwner() {
-  const session = await auth();
+  const cookieStore = await cookies();
+  const supabase = await createClient(cookieStore);
 
-  if (!session?.user) {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
     throw new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const role = (session.user as { role?: string }).role;
-  if (role !== "OWNER") {
+  /* Optional: enforce a role stored in user_metadata or app_metadata */
+  const role = (user.app_metadata?.role ?? user.user_metadata?.role) as string | undefined;
+  if (role && role !== "OWNER") {
     throw new Response(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  return session;
+  return user;
 }

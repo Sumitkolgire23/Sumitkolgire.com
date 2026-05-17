@@ -185,7 +185,7 @@ function ArticlesClient({
                     }}
                   >
                     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {article.tags.slice(0, 3).map((tag) => (
+                      {article.tags.slice(0, 3).map((tag: string) => (
                         <span
                           key={tag}
                           style={{

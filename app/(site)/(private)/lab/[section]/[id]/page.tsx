@@ -5,29 +5,20 @@ import Link from "next/link";
 import LabEditor from "@/components/lab/LabEditor";
 import MetadataPanel from "@/components/lab/MetadataPanel";
 
-const SECTION_MAP: Record<string, { label: string; icon: string }> = {
-  diary:    { label: "Daily Diary", icon: "✎" },
-  research: { label: "Research",    icon: "◈" },
-  ideas:    { label: "Ideas Wall",  icon: "✦" },
-  reading:  { label: "Reading List",icon: "≡" },
-  projects: { label: "Projects",    icon: "⬡" },
+const SECTION_MAP: Record<string, string> = {
+  diary: "Daily Diary", research: "Research",
+  ideas: "Ideas Wall",  reading: "Reading List",
 };
 
 export default async function LabEntryPage({
   params,
-}: {
-  params: Promise<{ section: string; id: string }>;
-}) {
+}: { params: Promise<{ section: string; id: string }> }) {
   const { section, id } = await params;
-  const meta = SECTION_MAP[section];
-
-  // If section doesn't exist, redirect to general dashboard
-  if (!meta && section !== "published") redirect("/lab");
+  if (!SECTION_MAP[section] && section !== "published") redirect("/lab");
 
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
 
-  // Fetch entry
   const { data: entry } = await supabase
     .from("lab_entries")
     .select("*")
@@ -38,26 +29,21 @@ export default async function LabEntryPage({
   if (!entry) notFound();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      
-      {/* Top bar */}
-      <div className="lab-topbar">
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <span style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", color: "var(--ghost)" }}>
-            <Link href="/lab" style={{ color: "var(--ghost)", textDecoration: "none" }}>Lab</Link>
-            {" "}/{" "}
-            <Link href={`/lab/${section}`} style={{ color: "var(--ghost)", textDecoration: "none" }}>{meta?.label || "Archive"}</Link>
-            {" "}/
-          </span>
-          <span style={{ fontFamily: "var(--mono)", fontSize: "0.75rem", fontWeight: 700, color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 300 }}>
-            {entry.title || "Untitled"}
+    <>
+      {/* Editor occupies lab-main (center column of the shell grid) */}
+      <div className="editor-view fade-in">
+        {/* Breadcrumb */}
+        <div className="editor-back">
+          <span className="editor-breadcrumb">
+            <Link href="/lab" style={{ color: "var(--text3)", textDecoration: "none" }}>Lab</Link>
+            {" / "}
+            <Link href={`/lab/${section}`} style={{ color: "var(--text3)", textDecoration: "none" }}>
+              {SECTION_MAP[section] ?? section}
+            </Link>
+            {" /"}
           </span>
         </div>
-      </div>
 
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        
-        {/* Main Editor Zone */}
         <LabEditor
           entryId={entry.id}
           section={section}
@@ -65,18 +51,24 @@ export default async function LabEntryPage({
           initialContent={entry.content}
           initialTags={entry.tags}
         />
-
-        {/* Right Metadata Zone */}
-        <MetadataPanel
-          entryId={entry.id}
-          section={section}
-          initialVisibility={entry.visibility}
-          initialType={entry.type}
-          createdAt={entry.created_at}
-          updatedAt={entry.updated_at}
-        />
-
       </div>
-    </div>
+
+      {/*
+        MetadataPanel renders into the right-panel grid column.
+        The layout shell already has grid-template-columns: 220px 1fr 260px.
+        We place it as the next sibling of lab-main so CSS grid puts it in col 3.
+      */}
+      <MetadataPanel
+        entryId={entry.id}
+        section={section}
+        initialVisibility={entry.visibility}
+        initialType={entry.type}
+        initialMood={entry.mood}
+        initialTags={entry.tags ?? []}
+        initialWordCount={entry.word_count ?? 0}
+        createdAt={entry.created_at}
+        updatedAt={entry.updated_at}
+      />
+    </>
   );
 }

@@ -69,7 +69,7 @@ export default function ProjectsPage() {
                   {/* Tech stack tags */}
                   {project.stack && project.stack.length > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                      {project.stack.slice(0, 5).map((tech) => (
+                       {project.stack.slice(0, 5).map((tech: string) => (
                         <span key={tech} style={{ fontFamily: "var(--mono)", fontSize: "0.6rem", letterSpacing: "0.06em", color: "var(--teal)", border: "1px solid var(--teal-light)", padding: "0.1rem 0.4rem", background: "var(--teal-light)" }}>
                           {tech}
                         </span>

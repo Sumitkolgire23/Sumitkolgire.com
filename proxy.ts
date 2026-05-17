@@ -1,31 +1,30 @@
-import { type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
-const PROTECTED_PREFIXES = ["/lab-diary", "/ideas", "/lab"];
+/* All routes requiring an active Supabase session */
+const PROTECTED_PREFIXES = ["/lab"];
 
 export async function proxy(request: NextRequest) {
-  // Only run session update on protected routes to save execution time
-  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
-    request.nextUrl.pathname.startsWith(prefix)
-  );
+  const { pathname } = request.nextUrl;
 
-  if (!isProtected) {
-    return;
-  }
+  /* Pass public routes straight through — no session overhead */
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+  if (!isProtected) return NextResponse.next();
 
+  /* updateSession refreshes the cookie and enforces auth guard */
   return await updateSession(request);
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - studio (Sanity studio routes)
-     * Feel free to modify this pattern to include more paths.
+     * Match all paths except:
+     * - _next/static, _next/image  (Next.js internals)
+     * - favicon.ico, sitemap.xml, robots.txt  (static assets)
+     * - /login  (must be publicly accessible)
+     * - /studio  (Sanity Studio)
+     * - Image extensions
      */
-    "/((?!_next/static|_next/image|favicon.ico|studio|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt|login|studio|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -9,46 +9,56 @@ interface MetadataPanelProps {
   section: string;
   initialVisibility?: string;
   initialType?: string;
+  initialMood?: string;
+  initialTags?: string[];
+  initialWordCount?: number;
+  wordGoal?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
-const TYPE_OPTIONS = [
-  { value: "log",        label: "Log" },
-  { value: "research",   label: "Research" },
-  { value: "idea",       label: "Idea" },
-  { value: "reference",  label: "Reference" },
-  { value: "experiment", label: "Experiment" },
-];
-
-const VISIBILITY_OPTIONS = [
-  { value: "private",  label: "🔒 Private" },
-  { value: "unlisted", label: "⚬ Unlisted" },
-  { value: "public",   label: "↗ Public" },
-];
+const ENTRY_TYPES = ["Log","Breakthrough","Reflection","Experiment","Research","Decision"];
+const MOODS       = ["Stillness","Chaos","Breakthrough","Reflection"];
 
 function fmt(iso?: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
-  });
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export default function MetadataPanel({
-  entryId,
-  section,
+  entryId, section,
   initialVisibility = "private",
-  initialType = "log",
-  createdAt,
-  updatedAt,
+  initialType       = "log",
+  initialMood       = "",
+  initialTags       = [],
+  initialWordCount  = 0,
+  wordGoal          = 500,
+  createdAt, updatedAt,
 }: MetadataPanelProps) {
+  const [type, setType]           = useState(initialType);
+  const [mood, setMood]           = useState(initialMood);
   const [visibility, setVisibility] = useState(initialVisibility);
-  const [type, setType] = useState(initialType);
+  const [tags, setTags]           = useState<string[]>(initialTags);
+  const [tagInput, setTagInput]   = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const update = (payload: object) =>
-    startTransition(() => updateLabEntryMeta(entryId, payload));
+    startTransition(() => { void updateLabEntryMeta(entryId, payload); });
+
+  const addTag = () => {
+    const t = tagInput.trim().toLowerCase().replace(/^#/, "");
+    if (!t || tags.includes(t)) { setTagInput(""); return; }
+    const next = [...tags, t];
+    setTags(next);
+    setTagInput("");
+    update({ tags: next });
+  };
+  const removeTag = (t: string) => {
+    const next = tags.filter((x) => x !== t);
+    setTags(next);
+    update({ tags: next });
+  };
 
   const handleDelete = () => {
     if (!confirm("Delete this entry? It will be soft-deleted and recoverable.")) return;
@@ -58,53 +68,118 @@ export default function MetadataPanel({
     });
   };
 
+  const goalPct = Math.min(100, Math.round((initialWordCount / wordGoal) * 100));
+
   return (
-    <aside className="lab-editor-meta">
+    <aside className="lab-rightpanel">
 
-      <span className="meta-label">Entry Type</span>
-      <select
-        className="meta-select"
-        value={type}
-        onChange={(e) => { setType(e.target.value); update({ type: e.target.value }); }}
-        disabled={isPending}
-        aria-label="Entry type"
-      >
-        {TYPE_OPTIONS.map(o => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
+      {/* Entry type */}
+      <div className="rp-section">
+        <div className="rp-label">Entry type</div>
+        <div className="rp-type-grid">
+          {ENTRY_TYPES.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={`rp-type-btn${type.toLowerCase() === t.toLowerCase() ? " active" : ""}`}
+              onClick={() => { setType(t.toLowerCase()); update({ type: t.toLowerCase() }); }}
+              disabled={isPending}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      <span className="meta-label">Visibility</span>
-      <select
-        className="meta-select"
-        value={visibility}
-        onChange={(e) => { setVisibility(e.target.value); update({ visibility: e.target.value }); }}
-        disabled={isPending}
-        aria-label="Visibility"
-      >
-        {VISIBILITY_OPTIONS.map(o => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
+      {/* Mood */}
+      <div className="rp-section">
+        <div className="rp-label">Mood</div>
+        <div className="mood-grid">
+          {MOODS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              className={`mood-btn${mood.toLowerCase() === m.toLowerCase() ? " active" : ""}`}
+              onClick={() => { setMood(m.toLowerCase()); update({ mood: m.toLowerCase() }); }}
+              disabled={isPending}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      <span className="meta-label">Created</span>
-      <div className="meta-date">{fmt(createdAt)}</div>
+      {/* Visibility */}
+      <div className="rp-section">
+        <div className="rp-label">Visibility</div>
+        <div className="vis-toggle">
+          {(["private","public","unlisted"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              className={`vis-btn${visibility === v ? ` active-${v}` : ""}`}
+              onClick={() => { setVisibility(v); update({ visibility: v }); }}
+              disabled={isPending}
+            >
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      <span className="meta-label">Last edited</span>
-      <div className="meta-date">{fmt(updatedAt)}</div>
+      {/* Tags */}
+      <div className="rp-section">
+        <div className="rp-label">Tags</div>
+        <input
+          className="tag-input"
+          placeholder="Add tag..."
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+        />
+        {tags.length > 0 && (
+          <div className="current-tags">
+            {tags.map((t) => (
+              <span key={t} className="ctag" onClick={() => removeTag(t)}>
+                {t} <span style={{ opacity: .5 }}>×</span>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <button className="meta-publish-btn" disabled={isPending} type="button">
-        Promote to Draft ↗
-      </button>
+      {/* Writing goal */}
+      <div className="rp-section">
+        <div className="rp-label">Writing goal</div>
+        <div className="word-goal-wrap">
+          <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text2)" }}>
+            {initialWordCount} / {wordGoal} words today
+          </div>
+          <div className="goal-bar">
+            <div className="goal-fill" style={{ width: `${goalPct}%` }} />
+          </div>
+          <div className="goal-text"><span>0</span><span>{wordGoal} words</span></div>
+        </div>
+      </div>
 
-      <button
-        className="meta-delete-btn"
-        onClick={handleDelete}
-        disabled={isPending}
-        type="button"
-      >
-        Delete entry
-      </button>
+      {/* Dates */}
+      <div className="rp-section">
+        <div className="rp-label">Dates</div>
+        <div className="rp-date">
+          Created <span>{fmt(createdAt)}</span><br />
+          Edited <span>{updatedAt ? fmt(updatedAt) : "just now"}</span>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="rp-section">
+        <button className="promote-to-sanity" type="button" disabled={isPending}>
+          <span>↑</span> Promote to public draft
+        </button>
+        <button className="delete-entry-btn" type="button" onClick={handleDelete} disabled={isPending}>
+          Delete entry
+        </button>
+      </div>
 
     </aside>
   );

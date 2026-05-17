@@ -1,1 +1,1 @@
-export { default } from 'next-sanity/studio'
+export { NextStudio as default } from 'next-sanity/studio';

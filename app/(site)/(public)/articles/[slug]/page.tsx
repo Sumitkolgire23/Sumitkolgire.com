@@ -68,7 +68,7 @@ export default async function ArticlePage({
             <div
               style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}
             >
-              {article.tags.map((tag) => (
+              {article.tags.map((tag: string) => (
                 <a
                   key={tag}
                   href={`/tags/${tag}`}

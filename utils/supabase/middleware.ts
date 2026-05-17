@@ -32,7 +32,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isProtected = request.nextUrl.pathname.startsWith("/lab-diary") || request.nextUrl.pathname.startsWith("/ideas");
+  /* Guard all /lab routes — redirect unauthenticated users to /login */
+  const isProtected = request.nextUrl.pathname.startsWith("/lab");
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
