@@ -156,3 +156,37 @@ export async function getIdeasStats(): Promise<{ total: number; ripe: number }> 
     return { total: 0, ripe: 0 };
   }
 }
+// ── Resources (is_public = true) ─────────────────────────────────────────
+
+export type PublicResource = {
+  id: string;
+  title: string;
+  url: string;
+  note: string | null;
+  domain: string | null;
+  type: string | null;
+  created_at: string;
+};
+
+export async function getPublicResources(): Promise<PublicResource[]> {
+  const supabase = createPublicClient();
+  if (!supabase) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from("resources")
+      .select("id, title, url, note, domain, type, created_at")
+      .eq("is_public", true)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[getPublicResources]", error.message);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.error("[getPublicResources] Network error:", err);
+    return [];
+  }
+}

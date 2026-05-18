@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getDocs, getAllDocsTags } from "@/lib/velite";
+import { getDocs, getAllTags } from "@/lib/velite";
 import { DocsListing } from "./DocsListing";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default function DocsPage() {
     excerpt: d.excerpt,
     tags: d.tags,
   }));
-  const allTags = getAllDocsTags ? getAllDocsTags() : []; // Fallback in case not exported
+  const allTags = Array.from(new Set(docs.flatMap(d => d.tags))).sort();
 
   return (
     <main style={{ background: "var(--bg)", minHeight: "100vh" }}>

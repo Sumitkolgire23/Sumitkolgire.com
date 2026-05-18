@@ -1,151 +1,271 @@
 import type { Metadata } from "next";
-import { InkDivider } from "@/components/wabi/InkDivider";
+import { getPublicResources } from "@/lib/public-data";
 
 export const metadata: Metadata = {
-  title: "Resources",
-  description: "Sumit Kolgire's curated reading list — books, papers, tools, and links. Every link has a reason for being here.",
+  title: "Resources — Sumit Kolgire",
+  description:
+    "Curated books, papers, tools, and links. Every link has a reason for being here.",
 };
-
-// ── Seed data for Phase 1 (will be replaced with DB in Phase 2) ──────────────
-const SEED_RESOURCES = [
-  {
-    id: "1",
-    domain: "AI",
-    title: "Attention Is All You Need",
-    url: "https://arxiv.org/abs/1706.03762",
-    note: "The Transformer paper. Still the most important ML paper of the decade.",
-  },
-  {
-    id: "2",
-    domain: "Systems",
-    title: "Designing Data-Intensive Applications",
-    url: "https://dataintensive.net/",
-    note: "Martin Kleppmann's masterclass. Read this before touching any distributed system.",
-  },
-  {
-    id: "3",
-    domain: "Philosophy",
-    title: "The Courage to Be Disliked",
-    url: "https://www.goodreads.com/book/show/43306206",
-    note: "Adlerian philosophy as dialogue. Changed how I think about purpose vs. approval.",
-  },
-  {
-    id: "4",
-    domain: "Tools",
-    title: "Obsidian",
-    url: "https://obsidian.md",
-    note: "My second brain. The only note-taking tool that gets out of the way.",
-  },
-  {
-    id: "5",
-    domain: "Research",
-    title: "LLM Agents Survey (2024)",
-    url: "https://arxiv.org/abs/2308.11432",
-    note: "Best survey on autonomous LLM agents. My reference for Ryuu AI OS architecture.",
-  },
-  {
-    id: "6",
-    domain: "Web",
-    title: "Josh W Comeau's CSS blog",
-    url: "https://www.joshwcomeau.com",
-    note: "The best CSS explanations on the internet. Visualizes concepts nobody else bothers to.",
-  },
-];
 
 const DOMAIN_COLORS: Record<string, string> = {
   AI: "var(--teal)",
   ML: "var(--teal)",
+  Research: "var(--warn)",
   Systems: "var(--gold)",
   Philosophy: "var(--seal)",
   Tools: "var(--ok)",
   Web: "var(--ink-mid)",
-  Research: "var(--warn)",
+  Design: "var(--seal)",
 };
 
-// Group by domain
-function groupByDomain(items: typeof SEED_RESOURCES) {
-  return items.reduce<Record<string, typeof SEED_RESOURCES>>((acc, item) => {
-    if (!acc[item.domain]) acc[item.domain] = [];
-    acc[item.domain].push(item);
+// ── Fallback seed data (shown when DB is empty) ────────────────────────────
+const SEED_RESOURCES = [
+  {
+    id: "seed-1",
+    domain: "AI",
+    title: "Attention Is All You Need",
+    url: "https://arxiv.org/abs/1706.03762",
+    note: "The Transformer paper. Still the most important ML paper of the decade.",
+    type: "paper",
+    created_at: "",
+  },
+  {
+    id: "seed-2",
+    domain: "Systems",
+    title: "Designing Data-Intensive Applications",
+    url: "https://dataintensive.net/",
+    note: "Martin Kleppmann's masterclass. Read this before touching any distributed system.",
+    type: "book",
+    created_at: "",
+  },
+  {
+    id: "seed-3",
+    domain: "Philosophy",
+    title: "The Courage to Be Disliked",
+    url: "https://www.goodreads.com/book/show/43306206",
+    note: "Adlerian philosophy as dialogue. Changed how I think about purpose vs. approval.",
+    type: "book",
+    created_at: "",
+  },
+  {
+    id: "seed-4",
+    domain: "Tools",
+    title: "Obsidian",
+    url: "https://obsidian.md",
+    note: "My second brain. The only note-taking tool that gets out of the way.",
+    type: "tool",
+    created_at: "",
+  },
+  {
+    id: "seed-5",
+    domain: "Research",
+    title: "LLM Agents Survey (2024)",
+    url: "https://arxiv.org/abs/2308.11432",
+    note: "Best survey on autonomous LLM agents. My reference for Ryuu AI OS architecture.",
+    type: "paper",
+    created_at: "",
+  },
+  {
+    id: "seed-6",
+    domain: "Web",
+    title: "Josh W Comeau's CSS blog",
+    url: "https://www.joshwcomeau.com",
+    note: "The best CSS explanations on the internet. Visualises concepts nobody else bothers to.",
+    type: "link",
+    created_at: "",
+  },
+];
+
+type Resource = {
+  id: string;
+  title: string;
+  url: string;
+  note: string | null;
+  domain: string | null;
+  type: string | null;
+  created_at: string;
+};
+
+function groupByDomain(items: Resource[]) {
+  return items.reduce<Record<string, Resource[]>>((acc, item) => {
+    const key = item.domain ?? "Other";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
     return acc;
   }, {});
 }
 
-export default function ResourcesPage() {
-  const grouped = groupByDomain(SEED_RESOURCES);
+export default async function ResourcesPage() {
+  let resources = await getPublicResources();
+
+  // Fall back to seed data if DB is empty
+  if (!resources.length) {
+    resources = SEED_RESOURCES;
+  }
+
+  const grouped = groupByDomain(resources);
   const domains = Object.keys(grouped).sort();
 
   return (
-    <>
-      <section className="page-section" style={{ paddingBottom: "2rem" }}>
-        <div className="section-container">
-          <p style={{ fontFamily: "var(--mono)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "var(--ink-mid)", textTransform: "uppercase", marginBottom: "0.75rem" }}>
+    <main style={{ background: "var(--bg)", minHeight: "100vh" }}>
+
+      {/* ── HEADER ──────────────────────────────────────────── */}
+      <section
+        style={{
+          borderBottom: "1px solid var(--border)",
+          padding: "80px 40px 60px",
+        }}
+      >
+        <div style={{ maxWidth: "var(--site-width)", margin: "0 auto" }}>
+          <div
+            style={{
+              fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)",
+              letterSpacing: ".2em", textTransform: "uppercase",
+              marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px",
+            }}
+          >
+            <span style={{ display: "inline-block", width: "16px", height: "1px", background: "var(--seal)" }} />
             Resources
-          </p>
-          <h1 style={{ fontFamily: "var(--serif)", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 700, color: "var(--ink)", marginBottom: "0.75rem", lineHeight: 1.15 }}>
+          </div>
+          <h1
+            style={{
+              fontFamily: "var(--serif)", fontSize: "clamp(2rem, 4vw, 3rem)",
+              fontStyle: "italic", fontWeight: 400, color: "var(--text)",
+              lineHeight: 1.1, marginBottom: "16px",
+            }}
+          >
             The Curated Library
           </h1>
-          <p style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1rem", color: "var(--ink-mid)", maxWidth: "52ch", lineHeight: 1.7 }}>
-            Books, papers, tools, and links that shaped how I think. Every link has a reason for being here.
+          <p
+            style={{
+              fontSize: "15px", color: "var(--text2)", lineHeight: 1.75,
+              maxWidth: "50ch", fontStyle: "italic",
+            }}
+          >
+            Books, papers, tools, and links that shaped how I think.
+            Every link has a reason for being here.
           </p>
         </div>
       </section>
 
-      <InkDivider />
+      {/* ── RESOURCE GROUPS ─────────────────────────────────── */}
+      <section
+        style={{
+          maxWidth: "var(--site-width)",
+          margin: "0 auto",
+          padding: "60px 40px 80px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "60px",
+        }}
+      >
+        {domains.map((domain) => (
+          <div key={domain}>
+            {/* Domain heading */}
+            <div
+              style={{
+                display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "24px",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--mono)", fontSize: "9px", letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: DOMAIN_COLORS[domain] ?? "var(--text3)",
+                  border: `1px solid ${DOMAIN_COLORS[domain] ?? "var(--border)"}`,
+                  padding: "3px 8px",
+                }}
+              >
+                {domain}
+              </span>
+              <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+            </div>
 
-      <section className="page-section" style={{ paddingTop: "2rem" }}>
-        <div className="section-container">
-          <div style={{ display: "flex", flexDirection: "column", gap: "3rem" }}>
-            {domains.map((domain) => (
-              <div key={domain}>
-                {/* Domain heading */}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
-                  <span style={{
-                    fontFamily: "var(--mono)", fontSize: "0.65rem", letterSpacing: "0.12em",
-                    textTransform: "uppercase", color: DOMAIN_COLORS[domain] ?? "var(--ink-mid)",
-                    border: `1px solid ${DOMAIN_COLORS[domain] ?? "var(--ink-faint)"}`,
-                    padding: "0.15rem 0.55rem",
-                  }}>
-                    {domain}
-                  </span>
-                  <div style={{ flex: 1, height: "1px", background: "var(--ink-faint)" }} />
-                </div>
-
-                {/* Resource list */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-                  {grouped[domain].map((resource, i) => (
-                    <a
-                      key={resource.id}
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+            {/* Resource rows */}
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {grouped[domain].map((resource, i, arr) => (
+                <a
+                  key={resource.id}
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr auto",
+                    gap: "16px",
+                    alignItems: "start",
+                    padding: "20px 0",
+                    borderBottom: i < arr.length - 1 ? "1px solid var(--border)" : "none",
+                    textDecoration: "none",
+                    transition: "padding-left .15s",
+                  }}
+                  className="resource-row"
+                >
+                  <div>
+                    <div
                       style={{
-                        display: "block",
-                        padding: "1rem 0",
-                        borderBottom: "1px solid var(--ink-faint)",
-                        textDecoration: "none",
-                        transition: "background 0.15s",
+                        display: "flex", alignItems: "center", gap: "10px",
+                        marginBottom: "6px", flexWrap: "wrap",
                       }}
                     >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
-                        <span style={{ fontFamily: "var(--serif)", fontSize: "1rem", fontWeight: 600, color: "var(--ink)", lineHeight: 1.3 }}>
-                          {resource.title}
+                      <span
+                        style={{
+                          fontFamily: "var(--serif)", fontSize: "1rem",
+                          fontWeight: 500, color: "var(--text)", lineHeight: 1.3,
+                        }}
+                      >
+                        {resource.title}
+                      </span>
+                      {resource.type && (
+                        <span
+                          style={{
+                            fontFamily: "var(--mono)", fontSize: "8px",
+                            letterSpacing: "0.1em", textTransform: "uppercase",
+                            color: "var(--text4)", border: "1px solid var(--border)",
+                            padding: "1px 5px",
+                          }}
+                        >
+                          {resource.type}
                         </span>
-                        <span style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", color: "var(--ink-mid)" }}>
-                          ↗
-                        </span>
-                      </div>
-                      <p style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "0.875rem", color: "var(--ink-mid)", lineHeight: 1.6, margin: "0.35rem 0 0" }}>
+                      )}
+                    </div>
+                    {resource.note && (
+                      <p
+                        style={{
+                          fontFamily: "var(--serif)", fontStyle: "italic",
+                          fontSize: "13px", color: "var(--text2)",
+                          lineHeight: 1.65, margin: 0, maxWidth: "60ch",
+                        }}
+                      >
                         {resource.note}
                       </p>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
+                    )}
+                  </div>
+                  <span
+                    style={{
+                      fontFamily: "var(--mono)", fontSize: "12px",
+                      color: "var(--text4)", paddingTop: "2px",
+                      transition: "color .15s",
+                    }}
+                    className="resource-arrow"
+                  >
+                    ↗
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
       </section>
-    </>
+
+      <style>{`
+        .resource-row:hover { padding-left: 12px; background: var(--bg2); margin-left: -12px; padding-right: 12px; }
+        .resource-row:hover .resource-arrow { color: var(--seal) !important; }
+
+        @media (max-width: 640px) {
+          section { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+      `}</style>
+    </main>
   );
 }

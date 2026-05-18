@@ -1,16 +1,14 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
-import { hashIP, getClientIP } from "@/lib/hash";
+import { hashIP } from "@/lib/hash";
 
 export async function addReaction(postSlug: string, type: 'like' | 'idea' | 'fire') {
   try {
-    const supabase = await createClient();
-    
-    // Not importing headers dynamically because getClientIP takes Request in lib/hash?
-    // Wait, next/headers handles it.
-    // I need to redefine getClientIP to use next/headers if needed.
-    // Let's just do it here to be safe.
+    const cookieStore = await cookies();
+    const supabase = await createClient(cookieStore);
+
     const { headers } = await import("next/headers");
     const reqHeaders = await headers();
     
