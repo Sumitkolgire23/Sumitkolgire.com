@@ -1,0 +1,26 @@
+[
+  {
+    "title": "NOVELMAN — A Web Novel Platform with AI at the Core",
+    "slug": "projects/novelman",
+    "date": "2026-04-30T00:00:00.000Z",
+    "excerpt": "Building a platform where AI doesn't replace the author — it amplifies the story. Architecture decisions, trade-offs, and lessons from building NOVELMAN.",
+    "tags": [
+      "ai",
+      "full-stack",
+      "platform",
+      "next.js"
+    ],
+    "status": "published",
+    "projectStatus": "active",
+    "stack": [
+      "Next.js",
+      "TypeScript",
+      "Supabase",
+      "PostgreSQL",
+      "Turborepo",
+      "Docker"
+    ],
+    "githubUrl": "https://github.com/sumitkolgire/novelman",
+    "body": "const{Fragment:e,jsx:t,jsxs:n}=arguments[0];function _createMdxContent(r){const i={code:\"code\",em:\"em\",h2:\"h2\",h3:\"h3\",li:\"li\",ol:\"ol\",p:\"p\",strong:\"strong\",ul:\"ul\",...r.components};return n(e,{children:[n(i.p,{children:[\"NOVELMAN started with a simple question: \",t(i.em,{children:\"what if the reading experience was as considered as the writing experience?\"})]}),\"\\n\",t(i.p,{children:\"Most novel platforms are read-centric databases. The author uploads a file, readers page through chapters, ads run. NOVELMAN is designed differently: the AI is a collaborator in the authoring process, not an afterthought in the reader experience.\"}),\"\\n\",t(i.h2,{children:\"The problem being solved\"}),\"\\n\",t(i.p,{children:\"Web novel authors — particularly indie authors — have three pain points:\"}),\"\\n\",n(i.ol,{children:[\"\\n\",n(i.li,{children:[t(i.strong,{children:\"Consistency across long-form work\"}),\" — character voice drift, plot thread management, world-state tracking\"]}),\"\\n\",n(i.li,{children:[t(i.strong,{children:\"Discovery\"}),\" — small authors with good writing struggle to reach readers\"]}),\"\\n\",n(i.li,{children:[t(i.strong,{children:\"Reader retention\"}),\" — static reading experiences don't compete well for attention\"]}),\"\\n\"]}),\"\\n\",t(i.p,{children:\"NOVELMAN targets all three, with AI as an enabling layer for the first and a better product design for the other two.\"}),\"\\n\",t(i.h2,{children:\"Architecture\"}),\"\\n\",t(i.p,{children:\"The system is a Turborepo monorepo with three main apps:\"}),\"\\n\",n(i.ul,{children:[\"\\n\",n(i.li,{children:[t(i.code,{children:\"apps/web\"}),\" — public-facing reader app (Next.js, SSG for chapters)\"]}),\"\\n\",n(i.li,{children:[t(i.code,{children:\"apps/studio\"}),\" — author writing and management environment\"]}),\"\\n\",n(i.li,{children:[t(i.code,{children:\"apps/api\"}),\" — shared API (REST + WebSocket)\"]}),\"\\n\"]}),\"\\n\",t(i.p,{children:\"The AI layer uses a multi-agent orchestration pattern: separate agents for continuity checking, character consistency, and style analysis, coordinated by a central router.\"}),\"\\n\",t(i.h3,{children:\"Database design\"}),\"\\n\",t(i.p,{children:'The most interesting decision was the content schema. Chapters are stored as structured prose (not raw HTML), with metadata layers: scene tags, POV character, location, time marker. This structure is what enables the AI to reason about continuity — you can\\'t ask \"is this consistent with chapter 12\" if chapter 12 is just a blob of text.'}),\"\\n\",t(i.h2,{children:\"What I learned\"}),\"\\n\",n(i.p,{children:[t(i.strong,{children:\"Turborepo has sharp edges.\"}),\" Build configuration between packages takes more upfront investment than a monolith, but the development speed once set up is significantly better.\"]}),\"\\n\",n(i.p,{children:[t(i.strong,{children:\"AI in authoring tools needs strict scoping.\"}),' Early versions of the AI were too \"helpful\" — they rewrote prose unprompted. The current design is strictly opt-in: the author triggers analysis, the AI responds, the author decides.']}),\"\\n\",n(i.p,{children:[t(i.strong,{children:\"The reading experience is the product.\"}),\" The most impactful change wasn't the AI features — it was improving typography, reading progress, and offline capability. Readers notice quality before they notice features.\"]}),\"\\n\",t(i.h2,{children:\"Current status\"}),\"\\n\",n(i.p,{children:[t(i.code,{children:\"[ACTIVE]\"}),\" — In development. Core reading and writing flows are complete. AI continuity features are in beta. Discovery system is next.\"]})]})}return{default:function(e={}){const{wrapper:n}=e.components||{};return n?t(n,{...e,children:t(_createMdxContent,{...e})}):_createMdxContent(e)}};"
+  }
+]

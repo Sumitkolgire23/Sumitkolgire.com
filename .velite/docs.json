@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Drizzle ORM with Supabase — A Practical Setup",
+    "slug": "docs/drizzle-supabase-setup",
+    "date": "2026-04-30T00:00:00.000Z",
+    "excerpt": "Type-safe database access with Drizzle ORM connected to Supabase PostgreSQL. Schema, migrations, and the patterns that actually work.",
+    "tags": [
+      "drizzle",
+      "supabase",
+      "postgresql",
+      "typescript"
+    ],
+    "status": "published",
+    "difficulty": "intermediate",
+    "domain": "Web",
+    "version": "drizzle-orm v0.39",
+    "body": "const{Fragment:e,jsx:n,jsxs:t}=arguments[0];function _createMdxContent(r){const i={code:\"code\",h2:\"h2\",li:\"li\",p:\"p\",pre:\"pre\",ul:\"ul\",...r.components};return t(e,{children:[n(i.p,{children:\"Drizzle ORM gives you full TypeScript control over your SQL without the magic of an ORM that hides what it's doing. Combined with Supabase's managed PostgreSQL, it's a strong stack for production apps.\"}),\"\\n\",n(i.h2,{children:\"Installation\"}),\"\\n\",n(i.pre,{children:n(i.code,{className:\"language-bash\",children:\"npm install drizzle-orm postgres\\nnpm install -D drizzle-kit\\n\"})}),\"\\n\",n(i.h2,{children:\"Configure the connection\"}),\"\\n\",n(i.pre,{children:n(i.code,{className:\"language-ts\",children:'// drizzle.config.ts\\nimport { defineConfig } from \"drizzle-kit\";\\n\\nexport default defineConfig({\\n  schema: \"./db/schema.ts\",\\n  out: \"./db/migrations\",\\n  dialect: \"postgresql\",\\n  dbCredentials: {\\n    url: process.env.DATABASE_URL!,\\n  },\\n});\\n'})}),\"\\n\",n(i.h2,{children:\"Define your schema\"}),\"\\n\",n(i.p,{children:\"Drizzle schemas are just TypeScript. There's no magic, no decorators — you write the table definition and Drizzle infers the types:\"}),\"\\n\",n(i.pre,{children:n(i.code,{className:\"language-ts\",children:'import { pgTable, text, uuid, timestamp } from \"drizzle-orm/pg-core\";\\n\\nexport const articles = pgTable(\"articles\", {\\n  id: uuid(\"id\").primaryKey().defaultRandom(),\\n  slug: text(\"slug\").notNull().unique(),\\n  title: text(\"title\").notNull(),\\n  createdAt: timestamp(\"created_at\").defaultNow().notNull(),\\n});\\n'})}),\"\\n\",n(i.h2,{children:\"Generate and run migrations\"}),\"\\n\",n(i.pre,{children:n(i.code,{className:\"language-bash\",children:\"# Generate SQL migration from schema changes\\nnpx drizzle-kit generate\\n\\n# Push directly to the DB (good for early dev)\\nnpx drizzle-kit push\\n\"})}),\"\\n\",n(i.h2,{children:\"Query pattern\"}),\"\\n\",n(i.pre,{children:n(i.code,{className:\"language-ts\",children:'import { db } from \"@/lib/db\";\\nimport { articles } from \"@/db/schema\";\\nimport { eq, desc } from \"drizzle-orm\";\\n\\n// Type-safe query — TypeScript knows the shape of the result\\nconst latestArticles = await db\\n  .select()\\n  .from(articles)\\n  .orderBy(desc(articles.createdAt))\\n  .limit(5);\\n'})}),\"\\n\",n(i.h2,{children:\"Gotchas\"}),\"\\n\",t(i.ul,{children:[\"\\n\",t(i.li,{children:[n(i.code,{children:\"drizzle-kit push\"}),\" is for development. In production, use \",n(i.code,{children:\"drizzle-kit migrate\"}),\".\"]}),\"\\n\",t(i.li,{children:[\"The \",n(i.code,{children:\"postgres\"}),\" driver (not \",n(i.code,{children:\"pg\"}),\") is recommended for \",n(i.code,{children:\"drizzle-orm\"}),\" — better ESM support.\"]}),\"\\n\",t(i.li,{children:[\"Connection pooling: set \",n(i.code,{children:\"max: 10\"}),\" to avoid exhausting Supabase's connection limit on the free tier.\"]}),\"\\n\"]})]})}return{default:function(e={}){const{wrapper:t}=e.components||{};return t?n(t,{...e,children:n(_createMdxContent,{...e})}):_createMdxContent(e)}};",
+    "toc": [
+      {
+        "title": "Installation",
+        "url": "#installation",
+        "items": []
+      },
+      {
+        "title": "Configure the connection",
+        "url": "#configure-the-connection",
+        "items": []
+      },
+      {
+        "title": "Define your schema",
+        "url": "#define-your-schema",
+        "items": []
+      },
+      {
+        "title": "Generate and run migrations",
+        "url": "#generate-and-run-migrations",
+        "items": []
+      },
+      {
+        "title": "Query pattern",
+        "url": "#query-pattern",
+        "items": []
+      },
+      {
+        "title": "Gotchas",
+        "url": "#gotchas",
+        "items": []
+      }
+    ]
+  }
+]

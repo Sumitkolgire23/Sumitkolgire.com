@@ -1,0 +1,19 @@
+[
+  {
+    "title": "AI Won't Replace Engineers — It Will Expose Bad Ones",
+    "slug": "perspectives/ai-wont-replace-engineers",
+    "date": "2026-04-30T00:00:00.000Z",
+    "excerpt": "The fear isn't about automation. It's about accountability. AI doesn't replace the engineer — it removes the excuse.",
+    "tags": [
+      "ai",
+      "engineering",
+      "opinion"
+    ],
+    "status": "published",
+    "featured": true,
+    "stance": "AI tools raise the bar for engineering quality, they don't lower the headcount.",
+    "counterView": "If the skill floor rises fast enough, junior engineers without fundamentals may find the gap insurmountable before they can build them.",
+    "contested": true,
+    "body": "const{Fragment:e,jsx:n,jsxs:t}=arguments[0];function _createMdxContent(i){const r={em:\"em\",h2:\"h2\",p:\"p\",strong:\"strong\",...i.components};return t(e,{children:[t(r.p,{children:[\"Every few months, the discourse resurfaces: \",n(r.em,{children:\"AI is going to replace software engineers.\"})]}),\"\\n\",n(r.p,{children:\"I think this gets the causality backwards.\"}),\"\\n\",n(r.h2,{children:\"The real pressure isn't replacement\"}),\"\\n\",t(r.p,{children:[\"AI tools — Copilot, Claude, Cursor — are extraordinarily good at generating boilerplate, suggesting implementations, and reducing the friction of writing obvious code. What they cannot do is \",n(r.strong,{children:\"define the problem correctly\"}),\".\"]}),\"\\n\",n(r.p,{children:\"The engineer's job has always been, at its core, a translation job: take an ambiguous human need, convert it into a precise specification, and implement it in a system that will fail in ways no one anticipated.\"}),\"\\n\",n(r.p,{children:\"AI doesn't do that. It does the third part reasonably well, when the first two parts have already been done.\"}),\"\\n\",n(r.h2,{children:\"What AI actually exposes\"}),\"\\n\",n(r.p,{children:\"Consider an engineer who relied on their ability to write CRUD endpoints quickly. That skill is now table stakes — anyone with a good prompt can do it. The differentiator has shifted.\"}),\"\\n\",t(r.p,{children:[\"The engineers who will be under pressure aren't the ones doing deep systems work. They're the ones whose primary value was \",n(r.strong,{children:\"producing code volume\"}),\". AI removes the friction that made volume impressive.\"]}),\"\\n\",n(r.p,{children:\"This is not a threat. It's a clarification.\"}),\"\\n\",n(r.h2,{children:\"The floor is rising, not the ceiling\"}),\"\\n\",n(r.p,{children:\"The engineering ceiling — the complexity of problems that require genuine systems thinking, security intuition, domain expertise, and architectural judgment — hasn't changed. What's changed is the floor.\"}),\"\\n\",t(r.p,{children:[\"Five years ago, you could build a career on implementation speed. That's harder now. The floor is code that \",n(r.em,{children:\"works\"}),\". The new floor is code that \",n(r.em,{children:\"should exist\"}),\".\"]}),\"\\n\",n(r.h2,{children:\"Where I might be wrong\"}),\"\\n\",n(r.p,{children:\"If the floor rises faster than junior engineers can build fundamentals, the path from beginner to competent engineer may become steeper, not easier. That's a real concern — not about AI replacing engineers, but about AI compressing the time available to develop judgment.\"}),\"\\n\",n(r.p,{children:\"The tool is neutral. The impact depends on what we do with the time it buys us.\"})]})}return{default:function(e={}){const{wrapper:t}=e.components||{};return t?n(t,{...e,children:n(_createMdxContent,{...e})}):_createMdxContent(e)}};"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Hello, This Is My Lab",
+    "slug": "articles/hello-this-is-my-lab",
+    "date": "2026-04-30T00:00:00.000Z",
+    "excerpt": "This site is a living documentation of how I think, build, and break things. Not a portfolio — a lab notebook.",
+    "tags": [
+      "meta",
+      "thinking",
+      "writing"
+    ],
+    "status": "published",
+    "featured": true,
+    "body": "const{Fragment:e,jsx:n,jsxs:t}=arguments[0];function _createMdxContent(i){const o={em:\"em\",h2:\"h2\",p:\"p\",strong:\"strong\",...i.components};return t(e,{children:[n(o.p,{children:\"I've been meaning to build this for a long time.\"}),\"\\n\",t(o.p,{children:['Not another developer portfolio. Not a \"10 things I learned this year\" blog. Something closer to a ',n(o.strong,{children:\"lab notebook\"}),\" — a public record of the work, the thinking, and sometimes, the mess in between.\"]}),\"\\n\",n(o.h2,{children:\"Who this is for\"}),\"\\n\",n(o.p,{children:\"Primarily for me. If you find value here, that's a bonus.\"}),\"\\n\",n(o.p,{children:\"I write to think clearly. When I explain something — a system, a concept, a decision — I understand it better. This site is the discipline of doing that in public.\"}),\"\\n\",n(o.h2,{children:\"What you'll find here\"}),\"\\n\",t(o.p,{children:[n(o.strong,{children:\"Articles\"}),\" — Long-form essays on AI, systems, and building. The kind of thinking that takes more than a tweet and less than a research paper.\"]}),\"\\n\",t(o.p,{children:[n(o.strong,{children:\"Perspectives\"}),\" — Shorter, more opinionated. A position I'm willing to defend. Sometimes contested.\"]}),\"\\n\",t(o.p,{children:[n(o.strong,{children:\"Projects\"}),\" — Not a list of GitHub repos. Case studies of the things I've actually built: what I was thinking, what broke, what I learned.\"]}),\"\\n\",t(o.p,{children:[n(o.strong,{children:\"Docs\"}),\" — Technical notes for my own reference. Published in case they're useful to you too.\"]}),\"\\n\",t(o.p,{children:[n(o.strong,{children:\"Resources\"}),\" — A curated list. Every link has a reason for being here.\"]}),\"\\n\",n(o.h2,{children:\"On writing style\"}),\"\\n\",n(o.p,{children:\"I prefer direct sentences. I'll tell you what I think, not what \\\"it could be argued.\\\" If I'm uncertain, I'll say so.\"}),\"\\n\",n(o.p,{children:\"I also believe that restraint is a design choice. This site won't have comment sections, likes, or a following count. It's not optimized for engagement — it's optimized for thinking.\"}),\"\\n\",n(o.h2,{children:\"On the design\"}),\"\\n\",t(o.p,{children:[\"This site is built on a Wabi-Sabi philosophy: imperfection-as-intention. The ruled paper background, the ink tones, the serif type — these are choices, not defaults. A researcher's notebook should \",n(o.em,{children:\"feel\"}),\" like a researcher's notebook.\"]}),\"\\n\",n(o.p,{children:\"Welcome to the lab.\"})]})}return{default:function(e={}){const{wrapper:t}=e.components||{};return t?n(t,{...e,children:n(_createMdxContent,{...e})}):_createMdxContent(e)}};",
+    "toc": [
+      {
+        "title": "Who this is for",
+        "url": "#who-this-is-for",
+        "items": []
+      },
+      {
+        "title": "What you'll find here",
+        "url": "#what-youll-find-here",
+        "items": []
+      },
+      {
+        "title": "On writing style",
+        "url": "#on-writing-style",
+        "items": []
+      },
+      {
+        "title": "On the design",
+        "url": "#on-the-design",
+        "items": []
+      }
+    ]
+  }
+]

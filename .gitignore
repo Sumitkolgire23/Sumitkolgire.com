@@ -36,7 +36,7 @@ yarn-error.log*
 .env.*.local
 
 # velite compiled output
-.velite/
+
 
 # drizzle generated migrations (optional — remove if you want to commit them)
 # db/migrations/
