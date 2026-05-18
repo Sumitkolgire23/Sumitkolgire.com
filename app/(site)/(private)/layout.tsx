@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { LabNav } from "@/components/lab/LabNav";
 import { LabTopBar } from "@/components/lab/LabTopBar";
@@ -9,7 +10,13 @@ export default async function PrivateLayout({ children }: { children: React.Reac
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
-  const initials = user?.email?.slice(0, 2).toUpperCase() ?? "SK";
+
+  // Layer 2 guard — redirect if somehow middleware was bypassed
+  if (!user) {
+    redirect("/login");
+  }
+
+  const initials = user.email?.slice(0, 2).toUpperCase() ?? "SK";
 
   let streak = 0;
   let heatmapLevels: number[] = Array(20).fill(0);

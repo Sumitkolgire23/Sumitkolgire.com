@@ -49,6 +49,7 @@ export default function LabEditor({
   const titleRef   = useRef<HTMLTextAreaElement>(null);
 
   const editor = useEditor({
+    immediatelyRender: false,   // prevent SSR hydration mismatch
     extensions: [
       StarterKit,
       Underline,

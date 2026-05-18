@@ -2,18 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOutAction } from "@/app/(auth)/actions";
 
 const TABS = [
-  { href: "/lab/diary",     label: "Daily Diary",  dot: "var(--seal)" },
-  { href: "/lab/ideas",     label: "Ideas Wall",   dot: "var(--gold)" },
-  { href: "/lab/research",  label: "Research",     dot: "var(--sky)"  },
-  { href: "/lab/reading",   label: "Reading List", dot: "var(--text3)"},
-  { href: "/lab/published", label: "Published",    dot: "var(--moss)" },
+  { href: "/lab/diary",     label: "Daily Diary",  dot: "var(--seal)"  },
+  { href: "/lab/ideas",     label: "Ideas Wall",   dot: "var(--gold)"  },
+  { href: "/lab/research",  label: "Research",     dot: "var(--sky)"   },
+  { href: "/lab/reading",   label: "Reading List", dot: "var(--text3)" },
+  { href: "/lab/published", label: "Published",    dot: "var(--moss)"  },
 ];
 
 interface LabTopBarProps { userInitial?: string; streak?: number; }
 
-export function LabTopBar({ userInitial = "SK", streak = 14 }: LabTopBarProps) {
+export function LabTopBar({ userInitial = "SK", streak = 0 }: LabTopBarProps) {
   const pathname = usePathname();
 
   return (
@@ -44,14 +45,45 @@ export function LabTopBar({ userInitial = "SK", streak = 14 }: LabTopBarProps) {
         ))}
       </nav>
 
-      {/* Right */}
+      {/* Right: streak + save status + logout */}
       <div className="topbar-right">
         <div className="streak-chip">{streak} day streak</div>
         <div className="save-status">
           <span className="save-dot" />
           <span>Saved</span>
         </div>
-        <div className="lab-avatar" aria-label="User menu">{userInitial}</div>
+
+        {/* Avatar + logout */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="lab-avatar" aria-label="Logged in user">{userInitial}</div>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              title="Sign out"
+              style={{
+                background: "transparent",
+                border: "1px solid var(--border)",
+                color: "var(--text3)",
+                fontFamily: "var(--mono)",
+                fontSize: "10px",
+                letterSpacing: ".08em",
+                padding: "4px 10px",
+                cursor: "pointer",
+                transition: "all .2s",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--seal)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--seal)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--text3)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+              }}
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
     </header>
   );

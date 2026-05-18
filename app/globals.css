@@ -16,15 +16,15 @@
   --bg5:     #202024;
 
   /* Borders */
-  --border:  #242428;
-  --border2: #2e2e33;
-  --border3: #3a3a42;
+  --border:  #2a2a2e;
+  --border2: #36363c;
+  --border3: #444449;
 
-  /* Text */
-  --text:    #e8e6e1;
-  --text2:   #a09d98;
-  --text3:   #5c5a57;
-  --text4:   #3a3936;
+  /* Text — maximum contrast, always readable on dark backgrounds */
+  --text:    #f8f5f0;   /* true near-white with warm tint — headings, labels */
+  --text2:   #dedad2;  /* strong readable — body copy, descriptions */
+  --text3:   #a8a49e;  /* legible muted — metadata, tags, dates */
+  --text4:   #706c68;  /* visible subtle — ghost labels, placeholders */
 
   /* Accent colors */
   --seal:    #c41e3a;
@@ -39,11 +39,11 @@
   --amber:   #e8924a;
 
   /* Legacy aliases used by existing components */
-  --ink:        var(--text);
-  --ink-2:      var(--text2);
-  --ink-mid:    var(--text3);
+  --ink:        var(--text);   /* = #f2efe9 */
+  --ink-2:      var(--text2);  /* = #ccc8c0 */
+  --ink-mid:    var(--text2);  /* ← was text3; now readable body colour */
   --ink-faint:  var(--border);
-  --ink-light:  var(--text3);
+  --ink-light:  var(--text3);  /* = #8a8680 */
   --muted:      var(--text3);
   --ghost:      var(--text4);
   --paper:      var(--bg);
@@ -78,7 +78,7 @@
 }
 
 html {
-  font-size: 15px;
+  font-size: 16px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -87,7 +87,7 @@ html {
 /* ── BODY ───────────────────────────────────────────────── */
 body {
   background: var(--bg);
-  color: var(--text);
+  color: var(--text); /* #f2efe9 globally */
   font-family: var(--sans);
   line-height: 1.7;
   overflow-x: hidden;
@@ -169,7 +169,24 @@ h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); }
 h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
 h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); }
 
+/* Paragraphs use text2 (#dedad2) — readable but distinct from headings */
 p { color: var(--text2); }
+
+/* Universal brightness floor — nothing should ever be invisible */
+.section-label,
+.meta,
+.overline,
+small,
+figcaption,
+caption {
+  color: var(--text3); /* #a8a49e — always legible */
+}
+
+mark {
+  background: rgba(196, 30, 58, 0.18);
+  color: var(--text);
+  padding: 0.1em 0.25em;
+}
 
 a {
   color: var(--seal);
@@ -384,17 +401,17 @@ pre code {
 /* ── PROSE WABI (MDX) ───────────────────────────────────── */
 .prose-wabi {
   max-width: var(--content-width);
-  color: var(--text2);
+  color: var(--text2);        /* #ccc8c0 — clearly readable body text */
   font-family: var(--serif);
-  font-size: clamp(1rem, 1.5vw, 1.1rem);
-  line-height: 1.85;
+  font-size: clamp(1.05rem, 1.5vw, 1.15rem);
+  line-height: 1.9;
 }
-.prose-wabi p { margin: 1.4em 0; }
+.prose-wabi p { margin: 1.4em 0; color: var(--text2); }
 .prose-wabi h2 {
   font-family: var(--serif);
-  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
   font-weight: 400;
-  color: var(--text);
+  color: var(--text);         /* near-white headings */
   margin: 2.5em 0 0.75em;
   line-height: 1.2;
   padding-bottom: 0.4em;
@@ -402,19 +419,19 @@ pre code {
 }
 .prose-wabi h3 {
   font-family: var(--serif);
-  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
   color: var(--text);
   margin: 2em 0 0.5em;
 }
 .prose-wabi h4 {
   font-family: var(--mono);
   font-size: 0.85rem;
-  color: var(--text3);
+  color: var(--text3);        /* legible muted */
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 1.75em 0 0.5em;
 }
-.prose-wabi strong { color: var(--text); }
+.prose-wabi strong { color: var(--text); font-weight: 600; }
 .prose-wabi em { font-style: italic; color: var(--text2); }
 .prose-wabi a { color: var(--seal); }
 .prose-wabi a:hover { opacity: 0.75; }
@@ -423,14 +440,14 @@ pre code {
   padding: 0.5em 0 0.5em 1.5em;
   margin: 2em 0;
   font-style: italic;
-  color: var(--text3);
+  color: var(--text3);        /* #8a8680 — readable quote attribution */
 }
 .prose-wabi code {
   font-family: var(--mono);
-  font-size: 0.85em;
+  font-size: 0.875em;
   background: var(--bg3);
   padding: 0.15em 0.4em;
-  color: var(--text);
+  color: var(--text);         /* code always near-white */
   border: 1px solid var(--border);
 }
 .prose-wabi pre {
@@ -446,7 +463,7 @@ pre code {
 }
 .prose-wabi pre code { background: transparent; padding: 0; border: none; }
 .prose-wabi ul, .prose-wabi ol { padding-left: 1.5em; margin: 1.25em 0; }
-.prose-wabi li { margin: 0.4em 0; }
+.prose-wabi li { margin: 0.4em 0; color: var(--text2); }
 .prose-wabi ul li::marker { color: var(--seal); }
 .prose-wabi ol li::marker { color: var(--text3); font-family: var(--mono); font-size: 0.85em; }
 .prose-wabi hr { border: none; border-top: 1px solid var(--border); margin: 2.5em 0; }

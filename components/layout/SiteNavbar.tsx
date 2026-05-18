@@ -69,7 +69,7 @@ export function SiteNavbar() {
             <text fontFamily="'Geist Mono',monospace" fontSize="4" fill="#c41e3a" textAnchor="middle" x="16" y="21" letterSpacing="1">LAB</text>
           </svg>
           <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-            <span style={{ fontFamily: "var(--mono)", fontSize: "12px", color: "var(--text)", letterSpacing: "0.05em" }}>
+            <span style={{ fontFamily: "var(--mono)", fontSize: "12px", color: "var(--text2)", letterSpacing: "0.05em" }}>
               sumit kolgire
             </span>
             <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
@@ -93,7 +93,7 @@ export function SiteNavbar() {
                   style={{
                     fontFamily: "var(--mono)",
                     fontSize: "11px",
-                    color: active ? "var(--text)" : "var(--text3)",
+                    color: active ? "var(--text)" : "var(--text2)",
                     textDecoration: "none",
                     padding: "5px 10px",
                     borderRadius: "5px",
@@ -106,7 +106,7 @@ export function SiteNavbar() {
                     (e.currentTarget as HTMLElement).style.background = "var(--bg3)";
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color = active ? "var(--text)" : "var(--text3)";
+                    (e.currentTarget as HTMLElement).style.color = active ? "var(--text)" : "var(--text2)";
                     (e.currentTarget as HTMLElement).style.background = active ? "var(--bg3)" : "transparent";
                   }}
                 >
@@ -117,40 +117,8 @@ export function SiteNavbar() {
           })}
         </ul>
 
-        {/* Lab CTA + hamburger */}
+        {/* Mobile hamburger only */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <Link
-            href="/lab"
-            className="hidden-mobile"
-            style={{
-              fontFamily: "var(--mono)",
-              fontSize: "10px",
-              color: "var(--seal)",
-              border: "1px solid rgba(196,30,58,.3)",
-              background: "var(--seal2)",
-              padding: "5px 14px",
-              borderRadius: "100px",
-              textDecoration: "none",
-              letterSpacing: "0.06em",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.background = "rgba(196,30,58,.18)";
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(196,30,58,.5)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.background = "var(--seal2)";
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(196,30,58,.3)";
-            }}
-          >
-            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "var(--seal)", animation: "blink 2s infinite", display: "inline-block" }} />
-            Enter lab
-          </Link>
-
-          {/* Mobile hamburger */}
           <button
             id="mobile-menu-toggle"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -191,16 +159,11 @@ export function SiteNavbar() {
           <ul role="list" style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {NAV_LINKS.map(({ href, label }) => (
               <li key={href}>
-                <Link href={href} style={{ fontFamily: "var(--mono)", fontSize: "0.9rem", color: pathname.startsWith(href) ? "var(--seal)" : "var(--text)", textDecoration: "none", letterSpacing: "0.04em" }}>
+                <Link href={href} style={{ fontFamily: "var(--mono)", fontSize: "0.9rem", color: pathname.startsWith(href) ? "var(--seal)" : "var(--text2)", textDecoration: "none", letterSpacing: "0.04em" }}>
                   {label}
                 </Link>
               </li>
             ))}
-            <li>
-              <Link href="/lab" style={{ fontFamily: "var(--mono)", fontSize: "0.9rem", color: "var(--seal)", textDecoration: "none", letterSpacing: "0.04em" }}>
-                Enter lab →
-              </Link>
-            </li>
           </ul>
         </div>
       )}

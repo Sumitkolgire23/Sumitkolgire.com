@@ -9,6 +9,10 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
  * RLS policies must have is_public = true for rows to be visible.
  */
 export function createPublicClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn("[createPublicClient] Supabase credentials missing");
+    return null;
+  }
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: { getAll: () => [], setAll: () => {} },
   });
@@ -26,38 +30,52 @@ export type PublicDiaryEntry = {
 
 export async function getPublicDiaryEntries(limit = 4): Promise<PublicDiaryEntry[]> {
   const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("diary_entries")
-    .select("id, mood, content, written_at, word_count")
-    .eq("is_public", true)
-    .is("deleted_at", null)
-    .order("written_at", { ascending: false })
-    .limit(limit);
+  if (!supabase) return [];
 
-  if (error) {
-    console.error("[getPublicDiaryEntries]", error.message);
+  try {
+    const { data, error } = await supabase
+      .from("diary_entries")
+      .select("id, mood, content, written_at, word_count")
+      .eq("is_public", true)
+      .is("deleted_at", null)
+      .order("written_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("[getPublicDiaryEntries]", error.message);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.error("[getPublicDiaryEntries] Network error:", err);
     return [];
   }
-  return data ?? [];
 }
 
 export async function getDiaryStreak(): Promise<number> {
   const supabase = createPublicClient();
-  // Fetch the last 60 days of public entry dates for streak calculation
-  const since = new Date();
-  since.setDate(since.getDate() - 60);
-  const { data, error } = await supabase
-    .from("diary_entries")
-    .select("written_at")
-    .eq("is_public", true)
-    .is("deleted_at", null)
-    .gte("written_at", since.toISOString())
-    .order("written_at", { ascending: false });
+  if (!supabase) return 0;
 
-  if (error || !data) return 0;
+  try {
+    // Fetch the last 60 days of public entry dates for streak calculation
+    const since = new Date();
+    since.setDate(since.getDate() - 60);
+    const { data, error } = await supabase
+      .from("diary_entries")
+      .select("written_at")
+      .eq("is_public", true)
+      .is("deleted_at", null)
+      .gte("written_at", since.toISOString())
+      .order("written_at", { ascending: false });
 
-  const dates = data.map((r) => r.written_at as string);
-  return calculateStreak(dates);
+    if (error || !data) return 0;
+
+    const dates = data.map((r) => r.written_at as string);
+    return calculateStreak(dates);
+  } catch (err) {
+    console.error("[getDiaryStreak] Network error:", err);
+    return 0;
+  }
 }
 
 function calculateStreak(dates: string[]): number {
@@ -97,30 +115,44 @@ export type PublicIdea = {
 
 export async function getPublicIdeas(limit = 4): Promise<PublicIdea[]> {
   const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("ideas")
-    .select("id, content, ripeness, planted_at, tags")
-    .eq("is_public", true)
-    .order("planted_at", { ascending: false })
-    .limit(limit);
+  if (!supabase) return [];
 
-  if (error) {
-    console.error("[getPublicIdeas]", error.message);
+  try {
+    const { data, error } = await supabase
+      .from("ideas")
+      .select("id, content, ripeness, planted_at, tags")
+      .eq("is_public", true)
+      .order("planted_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("[getPublicIdeas]", error.message);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.error("[getPublicIdeas] Network error:", err);
     return [];
   }
-  return data ?? [];
 }
 
 export async function getIdeasStats(): Promise<{ total: number; ripe: number }> {
   const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("ideas")
-    .select("ripeness")
-    .eq("is_public", true);
+  if (!supabase) return { total: 0, ripe: 0 };
 
-  if (error || !data) return { total: 0, ripe: 0 };
-  return {
-    total: data.length,
-    ripe: data.filter((r) => r.ripeness === "ripe" || r.ripeness === "published").length,
-  };
+  try {
+    const { data, error } = await supabase
+      .from("ideas")
+      .select("ripeness")
+      .eq("is_public", true);
+
+    if (error || !data) return { total: 0, ripe: 0 };
+    return {
+      total: data.length,
+      ripe: data.filter((r) => r.ripeness === "ripe" || r.ripeness === "published").length,
+    };
+  } catch (err) {
+    console.error("[getIdeasStats] Network error:", err);
+    return { total: 0, ripe: 0 };
+  }
 }
