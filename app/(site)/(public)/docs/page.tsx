@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getDocs } from "@/lib/velite";
-import { OffsetShadowCard } from "@/components/wabi/OffsetShadowCard";
-import { InkDivider } from "@/components/wabi/InkDivider";
+import { getDocs, getAllDocsTags } from "@/lib/velite";
+import { DocsListing } from "./DocsListing";
 
 export const metadata: Metadata = {
   title: "Docs",
@@ -9,57 +8,54 @@ export const metadata: Metadata = {
 };
 
 export default function DocsPage() {
-  const docs = getDocs();
+  const docs = getDocs().map(d => ({
+    slug: d.slug,
+    title: d.title,
+    excerpt: d.excerpt,
+    tags: d.tags,
+  }));
+  const allTags = getAllDocsTags ? getAllDocsTags() : []; // Fallback in case not exported
 
   return (
-    <>
-      <section className="page-section" style={{ paddingBottom: "2rem" }}>
-        <div className="section-container">
-          <p style={{ fontFamily: "var(--mono)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "var(--ink-mid)", textTransform: "uppercase", marginBottom: "0.75rem" }}>
+    <main style={{ background: "var(--bg)", minHeight: "100vh" }}>
+      <section
+        style={{
+          borderBottom: "1px solid var(--border)",
+          padding: "80px 40px 60px",
+        }}
+      >
+        <div style={{ maxWidth: "var(--site-width)", margin: "0 auto" }}>
+          <div
+            style={{
+              fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)",
+              letterSpacing: ".2em", textTransform: "uppercase",
+              marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px",
+            }}
+          >
+            <span style={{ display: "inline-block", width: "16px", height: "1px", background: "var(--seal)" }} />
             Docs
-          </p>
-          <h1 style={{ fontFamily: "var(--serif)", fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 700, color: "var(--ink)", marginBottom: "0.75rem", lineHeight: 1.15 }}>
+          </div>
+          <h1
+            style={{
+              fontFamily: "var(--serif)", fontSize: "clamp(2rem, 4vw, 3rem)",
+              fontStyle: "italic", fontWeight: 400, color: "var(--text)",
+              lineHeight: 1.1, marginBottom: "16px",
+            }}
+          >
             Technical Notes
           </h1>
-          <p style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1rem", color: "var(--ink-mid)", maxWidth: "52ch", lineHeight: 1.7 }}>
+          <p
+            style={{
+              fontSize: "15px", color: "var(--text2)", lineHeight: 1.75,
+              maxWidth: "50ch", fontStyle: "italic",
+            }}
+          >
             Reference docs written for my own use. Published in case they're useful to you too.
           </p>
         </div>
       </section>
 
-      <InkDivider />
-
-      <section className="page-section" style={{ paddingTop: "2rem" }}>
-        <div className="section-container">
-          {docs.length === 0 ? (
-            <p style={{ fontFamily: "var(--mono)", fontSize: "0.9rem", color: "var(--ink-mid)" }}>
-              No docs yet. Writing them as I build.
-            </p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {docs.map((doc) => (
-                <OffsetShadowCard key={doc.slug} href={`/docs/${doc.slug.split("/").pop()}`}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {doc.tags.slice(0, 3).map((tag: string) => (
-                        <span key={tag} style={{ fontFamily: "var(--mono)", fontSize: "0.62rem", letterSpacing: "0.08em", color: "var(--teal)", textTransform: "uppercase" }}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <h2 style={{ fontFamily: "var(--serif)", fontSize: "clamp(1rem, 2vw, 1.1rem)", fontWeight: 700, color: "var(--ink)", marginBottom: "0.35rem", lineHeight: 1.3 }}>
-                    {doc.title}
-                  </h2>
-                  <p style={{ fontSize: "0.875rem", color: "var(--ink-mid)", lineHeight: 1.6, margin: 0 }}>
-                    {doc.excerpt}
-                  </p>
-                </OffsetShadowCard>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-    </>
+      <DocsListing allDocs={docs} allTags={allTags} />
+    </main>
   );
 }

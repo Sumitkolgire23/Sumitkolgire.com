@@ -5,6 +5,9 @@ import { getArticleBySlug, getArticles, getRelatedArticles, urlSlug } from "@/li
 import { MDXContent } from "@/components/mdx-content";
 import { OffsetShadowCard } from "@/components/wabi/OffsetShadowCard";
 import { InkDivider } from "@/components/wabi/InkDivider";
+import { ReadingProgress } from "@/components/wabi/ReadingProgress";
+import { TableOfContents } from "@/components/wabi/TableOfContents";
+import { ReactionBar } from "@/components/wabi/ReactionBar";
 
 // ── STATIC PARAMS ─────────────────────────────────────────
 export function generateStaticParams() {
@@ -58,163 +61,199 @@ export default async function ArticlePage({
   return (
     <>
       {/* ── ARTICLE HEADER ──────────────────────────── */}
-      <article itemScope itemType="https://schema.org/Article">
-        <header className="page-section" style={{ paddingBottom: "2rem" }}>
-          <div
-            className="section-container"
-            style={{ maxWidth: "var(--content-width)", margin: "0 auto" }}
-          >
-            {/* Tags */}
+      <ReadingProgress />
+      
+      <div 
+        className="reader-grid" 
+        style={{ 
+          maxWidth: "1200px", 
+          margin: "0 auto", 
+          display: "grid", 
+          gap: "40px", 
+          padding: "40px 20px" 
+        }}
+      >
+        <article itemScope itemType="https://schema.org/Article">
+          <header className="page-section" style={{ paddingBottom: "2rem", paddingTop: "2rem" }}>
             <div
-              style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}
+              className="section-container"
+              style={{ maxWidth: "var(--content-width)", margin: "0 auto" }}
             >
-              {article.tags.map((tag: string) => (
-                <a
-                  key={tag}
-                  href={`/tags/${tag}`}
-                  style={{
-                    fontFamily: "var(--mono)",
-                    fontSize: "0.65rem",
-                    letterSpacing: "0.1em",
-                    color: "var(--seal)",
-                    textDecoration: "none",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {tag}
-                </a>
-              ))}
-            </div>
+              {/* Tags */}
+              <div
+                style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}
+              >
+                {article.tags.map((tag: string) => (
+                  <a
+                    key={tag}
+                    href={`/tags/${tag}`}
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.1em",
+                      color: "var(--seal)",
+                      textDecoration: "none",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {tag}
+                  </a>
+                ))}
+              </div>
 
-            {/* Title */}
-            <h1
-              itemProp="headline"
-              style={{
-                fontFamily: "var(--serif)",
-                fontSize: "clamp(1.75rem, 5vw, 2.75rem)",
-                fontWeight: 700,
-                lineHeight: 1.15,
-                letterSpacing: "-0.02em",
-                color: "var(--ink)",
-                marginBottom: "1rem",
-              }}
-            >
-              {article.title}
-            </h1>
-
-            {/* Excerpt */}
-            <p
-              style={{
-                fontFamily: "var(--serif)",
-                fontStyle: "italic",
-                fontSize: "1.05rem",
-                color: "var(--ink-mid)",
-                lineHeight: 1.7,
-                marginBottom: "1.5rem",
-                maxWidth: "52ch",
-              }}
-            >
-              {article.excerpt}
-            </p>
-
-            {/* Meta row */}
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "1rem",
-                alignItems: "center",
-                borderTop: "1px solid var(--ink-faint)",
-                paddingTop: "1rem",
-              }}
-            >
-              <time
-                itemProp="datePublished"
-                dateTime={article.date}
+              {/* Title */}
+              <h1
+                itemProp="headline"
                 style={{
-                  fontFamily: "var(--mono)",
-                  fontSize: "0.72rem",
-                  color: "var(--ink-mid)",
-                  letterSpacing: "0.04em",
+                  fontFamily: "var(--serif)",
+                  fontSize: "clamp(1.75rem, 5vw, 2.75rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.02em",
+                  color: "var(--ink)",
+                  marginBottom: "1rem",
                 }}
               >
-                {formatDate(article.date)}
-              </time>
-              {article.updated && article.updated !== article.date && (
-                <span
+                {article.title}
+              </h1>
+
+              {/* Excerpt */}
+              <p
+                style={{
+                  fontFamily: "var(--serif)",
+                  fontStyle: "italic",
+                  fontSize: "1.05rem",
+                  color: "var(--ink-mid)",
+                  lineHeight: 1.7,
+                  marginBottom: "1.5rem",
+                  maxWidth: "52ch",
+                }}
+              >
+                {article.excerpt}
+              </p>
+
+              {/* Meta row */}
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                  alignItems: "center",
+                  borderTop: "1px solid var(--ink-faint)",
+                  paddingTop: "1rem",
+                }}
+              >
+                <time
+                  itemProp="datePublished"
+                  dateTime={article.date}
                   style={{
                     fontFamily: "var(--mono)",
                     fontSize: "0.72rem",
                     color: "var(--ink-mid)",
-                    opacity: 0.7,
+                    letterSpacing: "0.04em",
                   }}
                 >
-                  Updated {formatDate(article.updated)}
-                </span>
-              )}
-              {article.readingTime && (
-                <span
-                  style={{
-                    fontFamily: "var(--mono)",
-                    fontSize: "0.72rem",
-                    color: "var(--ink-mid)",
-                  }}
-                >
-                  {article.readingTime} min read
-                </span>
-              )}
-              {article.wordCount && (
-                <span
-                  style={{
-                    fontFamily: "var(--mono)",
-                    fontSize: "0.72rem",
-                    color: "var(--ink-mid)",
-                    opacity: 0.6,
-                  }}
-                >
-                  {article.wordCount.toLocaleString()} words
-                </span>
-              )}
+                  {formatDate(article.date)}
+                </time>
+                {article.updated && article.updated !== article.date && (
+                  <span
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: "0.72rem",
+                      color: "var(--ink-mid)",
+                      opacity: 0.7,
+                    }}
+                  >
+                    Updated {formatDate(article.updated)}
+                  </span>
+                )}
+                {article.readingTime && (
+                  <span
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: "0.72rem",
+                      color: "var(--ink-mid)",
+                    }}
+                  >
+                    {article.readingTime} min read
+                  </span>
+                )}
+                {article.wordCount && (
+                  <span
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: "0.72rem",
+                      color: "var(--ink-mid)",
+                      opacity: 0.6,
+                    }}
+                  >
+                    {article.wordCount.toLocaleString()} words
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* ── ARTICLE BODY ────────────────────────────── */}
-        <div
-          className="page-section prose-wabi"
-          style={{
-            paddingTop: "1rem",
-            maxWidth: "var(--content-width)",
-            margin: "0 auto",
-            padding: "1rem 1.25rem 4rem",
-          }}
-          itemProp="articleBody"
-        >
-          <MDXContent code={article.body} />
-        </div>
-
-        {/* ── BACK LINK ─────────────────────────────── */}
-        <div
-          style={{
-            maxWidth: "var(--content-width)",
-            margin: "0 auto",
-            padding: "0 1.25rem 2rem",
-          }}
-        >
-          <a
-            href="/articles"
+          {/* ── ARTICLE BODY ────────────────────────────── */}
+          <div
+            className="prose-wabi"
             style={{
-              fontFamily: "var(--mono)",
-              fontSize: "0.75rem",
-              color: "var(--ink-mid)",
-              textDecoration: "none",
-              letterSpacing: "0.04em",
+              maxWidth: "var(--content-width)",
+              margin: "0 auto",
+              padding: "1rem 1.25rem 4rem",
+            }}
+            itemProp="articleBody"
+          >
+            <MDXContent code={article.body} />
+            <ReactionBar postSlug={article.slug} />
+          </div>
+
+          {/* ── BACK LINK ─────────────────────────────── */}
+          <div
+            style={{
+              maxWidth: "var(--content-width)",
+              margin: "0 auto",
+              padding: "0 1.25rem 2rem",
             }}
           >
-            ← All articles
-          </a>
-        </div>
-      </article>
+            <a
+              href="/articles"
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: "0.75rem",
+                color: "var(--ink-mid)",
+                textDecoration: "none",
+                letterSpacing: "0.04em",
+              }}
+            >
+              ← All articles
+            </a>
+          </div>
+        </article>
+
+        {/* ── SIDEBAR ─────────────────────────────────── */}
+        <aside className="article-sidebar" style={{ position: "sticky", top: "100px", alignSelf: "start" }}>
+          <TableOfContents selector=".prose-wabi" />
+        </aside>
+      </div>
+
+      <style>{`
+        /* Desktop Reader Grid */
+        @media (min-width: 1024px) {
+          .reader-grid {
+            grid-template-columns: 1fr 240px;
+          }
+        }
+        /* Mobile Reader Grid */
+        @media (max-width: 1023px) {
+          .reader-grid {
+            grid-template-columns: 1fr;
+          }
+          .article-sidebar {
+            display: none;
+          }
+        }
+      `}</style>
 
       {/* ── RELATED ARTICLES ─────────────────────────── */}
       {related.length > 0 && (
