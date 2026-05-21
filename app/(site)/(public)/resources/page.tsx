@@ -150,6 +150,7 @@ export default async function ResourcesPage() {
 
       {/* ── RESOURCE GROUPS ─────────────────────────────────── */}
       <section
+        className="resource-row-container"
         style={{
           maxWidth: "var(--site-width)",
           margin: "0 auto",
@@ -257,15 +258,6 @@ export default async function ResourcesPage() {
           </div>
         ))}
       </section>
-
-      <style>{`
-        .resource-row:hover { padding-left: 12px; background: var(--bg2); margin-left: -12px; padding-right: 12px; }
-        .resource-row:hover .resource-arrow { color: var(--seal) !important; }
-
-        @media (max-width: 640px) {
-          section { padding-left: 20px !important; padding-right: 20px !important; }
-        }
-      `}</style>
     </main>
   );
 }

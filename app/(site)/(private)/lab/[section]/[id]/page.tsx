@@ -4,7 +4,6 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import LabEditor from "@/components/lab/LabEditor";
 import MetadataPanel from "@/components/lab/MetadataPanel";
-import { requireOwner } from "@/lib/auth-guard";
 
 const SECTION_MAP: Record<string, string> = {
   diary: "Daily Diary", research: "Research",

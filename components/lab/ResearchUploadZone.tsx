@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { fetchArxivMetadata } from "@/app/(site)/(private)/lab/actions";
 
 interface ResearchUploadZoneProps {
   onImport?: (data: { title: string; url?: string; type: "pdf" | "arxiv" }) => Promise<{ id?: string; error?: string } | any>;
@@ -75,17 +76,17 @@ export function ResearchUploadZone({ onImport }: ResearchUploadZoneProps) {
         setStatus("loading");
         setStatusMsg(`Fetching arXiv:${id}…`);
         try {
-          // Use arXiv export API for metadata (no CORS issues — server-side preferred in prod)
-          const res = await fetch(`https://export.arxiv.org/abs/${id}`);
-          if (!res.ok) throw new Error();
-          const html = await res.text();
-          const titleMatch = html.match(/<h1 class="title[^"]*">\s*<span[^>]*>[^<]*<\/span>\s*([\s\S]*?)<\/h1>/i);
-          const title = titleMatch
-            ? titleMatch[1].trim()
-            : `arXiv:${id}`;
+          const meta = await fetchArxivMetadata(id);
+          if (meta.error) {
+             setStatus("error");
+             setStatusMsg(meta.error);
+             setTimeout(() => { setStatus("idle"); setStatusMsg(""); }, 3000);
+             return;
+          }
           
+          const title = meta.title;
           if (onImport) {
-            const importRes = await onImport({ title, url: `https://arxiv.org/abs/${id}`, type: "arxiv" });
+            const importRes = await onImport({ title, url: meta.url, type: "arxiv" });
             if (importRes && 'error' in importRes) {
                setStatus("error");
                setStatusMsg(importRes.error);

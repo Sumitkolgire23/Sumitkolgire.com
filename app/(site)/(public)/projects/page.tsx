@@ -245,11 +245,6 @@ export default function ProjectsPage() {
         </section>
       )}
 
-      {/* Hover styles */}
-      <style>{`
-        .proj-card-dark:hover { background: var(--bg2) !important; }
-        .proj-row-dark:hover  { background: var(--bg2); padding-left: 12px; }
-      `}</style>
     </main>
   );
 }

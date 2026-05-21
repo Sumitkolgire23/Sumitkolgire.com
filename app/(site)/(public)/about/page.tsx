@@ -364,15 +364,6 @@ export default function AboutPage() {
             Open to interesting conversations, collaboration on AI/ML research,
             and consulting. Not open to cold outreach trying to sell me something.
           </p>
-          <style>{`
-            .about-social-link {
-              font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
-              color: var(--text2); text-decoration: none;
-              border: 1px solid var(--border); padding: 10px 18px;
-              transition: all .2s;
-            }
-            .about-social-link:hover { border-color: var(--text3); color: var(--text); }
-          `}</style>
           <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
             {SOCIAL.map((link) => (
               <a

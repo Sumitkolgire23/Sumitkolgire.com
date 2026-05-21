@@ -70,3 +70,4 @@ The project is heavily inspired by Wabi-Sabi and Neural Parchment design princip
 ## 📖 License
 
 This project is open-source and available under the [MIT License](LICENSE).
+

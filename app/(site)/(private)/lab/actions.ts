@@ -240,3 +240,24 @@ export async function promoteIdea(
     return { error: "Unauthorized" };
   }
 }
+
+/** Fetch arXiv metadata server-side to avoid CORS issues */
+export async function fetchArxivMetadata(id: string): Promise<{ title: string; url: string; error?: string }> {
+  try {
+    // Only authenticated users can trigger fetches via this action
+    await getAuthClient();
+
+    const res = await fetch(`https://export.arxiv.org/abs/${id}`);
+    if (!res.ok) throw new Error(`arXiv responded with ${res.status}`);
+    const html = await res.text();
+    
+    // Extract title
+    const titleMatch = html.match(/<h1 class="title[^"]*">\s*<span[^>]*>[^<]*<\/span>\s*([\s\S]*?)<\/h1>/i);
+    const title = titleMatch ? titleMatch[1].trim() : `arXiv:${id}`;
+
+    return { title, url: `https://arxiv.org/abs/${id}` };
+  } catch (error) {
+    console.error("[fetchArxivMetadata]", error);
+    return { title: "", url: "", error: "Could not fetch arXiv metadata. Check the ID." };
+  }
+}

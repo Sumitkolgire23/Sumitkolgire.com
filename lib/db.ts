@@ -16,6 +16,9 @@ if (!connectionString) {
 
 // Use existing connection in dev, create new in prod
 const client = global._pgConnection ?? postgres(connectionString, {
+  // RED TEAM AUDIT NOTE [H-11]: `max: 10` will quickly exhaust Supabase free tier (25 conns max)
+  // in a serverless environment like Vercel because each instance gets its own pool.
+  // Switch to Supabase Transaction Pooler (port 6543) and set `max: 1` before scale.
   max: 10, // connection pool size
   idle_timeout: 20,
   connect_timeout: 10,

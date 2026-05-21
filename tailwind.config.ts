@@ -92,20 +92,6 @@ const config: Config = {
         wabi: "rgba(139,115,85,0.15)",
         "wabi-strong": "rgba(139,115,85,0.25)",
       },
-
-      // ── TYPOGRAPHY PLUGIN PROSE ────────────────────────────────
-      typography: {
-        wabi: {
-          css: {
-            "--tw-prose-body": "#2c2925",
-            "--tw-prose-headings": "#1c1a15",
-            "--tw-prose-links": "#c41e3a",
-            "--tw-prose-code": "#1c1a15",
-            "--tw-prose-pre-bg": "#1c1a15",
-            maxWidth: "75ch",
-          },
-        },
-      },
     },
   },
   plugins: [],
