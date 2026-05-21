@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { unstable_cache } from "next/cache";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -28,7 +29,7 @@ export type PublicDiaryEntry = {
   word_count: number;
 };
 
-export async function getPublicDiaryEntries(limit = 4): Promise<PublicDiaryEntry[]> {
+async function _getPublicDiaryEntries(limit: number): Promise<PublicDiaryEntry[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
 
@@ -52,12 +53,18 @@ export async function getPublicDiaryEntries(limit = 4): Promise<PublicDiaryEntry
   }
 }
 
-export async function getDiaryStreak(): Promise<number> {
+/** Cached: revalidates every 5 minutes. Tag: "diary" */
+export const getPublicDiaryEntries = unstable_cache(
+  (limit = 4) => _getPublicDiaryEntries(limit),
+  ["public-diary-entries"],
+  { revalidate: 300, tags: ["diary"] }
+);
+
+async function _getDiaryStreak(): Promise<number> {
   const supabase = createPublicClient();
   if (!supabase) return 0;
 
   try {
-    // Fetch the last 60 days of public entry dates for streak calculation
     const since = new Date();
     since.setDate(since.getDate() - 60);
     const { data, error } = await supabase
@@ -78,7 +85,18 @@ export async function getDiaryStreak(): Promise<number> {
   }
 }
 
-function calculateStreak(dates: string[]): number {
+/** Cached: revalidates every 5 minutes. Tag: "diary" */
+export const getDiaryStreak = unstable_cache(
+  () => _getDiaryStreak(),
+  ["diary-streak"],
+  { revalidate: 300, tags: ["diary"] }
+);
+
+/**
+ * calculateStreak — single source of truth (L-10 deduplication fix).
+ * Shared by public-data.ts and any private utils that need it.
+ */
+export function calculateStreak(dates: string[]): number {
   if (!dates.length) return 0;
   const uniqueDates = Array.from(
     new Set(dates.map((d) => new Date(d).toLocaleDateString("en-CA")))
@@ -113,7 +131,7 @@ export type PublicIdea = {
   tags: string[];
 };
 
-export async function getPublicIdeas(limit = 4): Promise<PublicIdea[]> {
+async function _getPublicIdeas(limit: number): Promise<PublicIdea[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
 
@@ -136,7 +154,14 @@ export async function getPublicIdeas(limit = 4): Promise<PublicIdea[]> {
   }
 }
 
-export async function getIdeasStats(): Promise<{ total: number; ripe: number }> {
+/** Cached: revalidates every 5 minutes. Tag: "ideas" */
+export const getPublicIdeas = unstable_cache(
+  (limit = 4) => _getPublicIdeas(limit),
+  ["public-ideas"],
+  { revalidate: 300, tags: ["ideas"] }
+);
+
+async function _getIdeasStats(): Promise<{ total: number; ripe: number }> {
   const supabase = createPublicClient();
   if (!supabase) return { total: 0, ripe: 0 };
 
@@ -156,6 +181,14 @@ export async function getIdeasStats(): Promise<{ total: number; ripe: number }> 
     return { total: 0, ripe: 0 };
   }
 }
+
+/** Cached: revalidates every 5 minutes. Tag: "ideas" */
+export const getIdeasStats = unstable_cache(
+  () => _getIdeasStats(),
+  ["ideas-stats"],
+  { revalidate: 300, tags: ["ideas"] }
+);
+
 // ── Resources (is_public = true) ─────────────────────────────────────────
 
 export type PublicResource = {
@@ -168,7 +201,7 @@ export type PublicResource = {
   created_at: string;
 };
 
-export async function getPublicResources(): Promise<PublicResource[]> {
+async function _getPublicResources(): Promise<PublicResource[]> {
   const supabase = createPublicClient();
   if (!supabase) return [];
 
@@ -190,3 +223,11 @@ export async function getPublicResources(): Promise<PublicResource[]> {
     return [];
   }
 }
+
+/** Cached: revalidates every hour. Resources change infrequently. Tag: "resources" */
+export const getPublicResources = unstable_cache(
+  () => _getPublicResources(),
+  ["public-resources"],
+  { revalidate: 3600, tags: ["resources"] }
+);
+

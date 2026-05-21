@@ -73,12 +73,14 @@ export default function LabEditor({
     timerRef.current = setTimeout(async () => {
       const res = await saveLabEntry(entryId, {
         title: titleRef.current?.value ?? "",
-        content, tags: initialTags, wordCount: wc,
+        content,
+        // Tags intentionally excluded — they are managed exclusively by MetadataPanel.
+        // Passing initialTags here would overwrite MetadataPanel changes on every keystroke.
+        wordCount: wc,
       });
       setSaveStatus(res.ok ? "saved" : "error");
     }, AUTOSAVE_MS);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entryId]);
+  }, [entryId]); // entryId is the only dep — titleRef/timerRef are stable refs
 
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 

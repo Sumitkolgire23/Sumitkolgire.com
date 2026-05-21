@@ -1,6 +1,15 @@
 import { createHash } from "crypto";
 
-const SALT = process.env.IP_HASH_SALT ?? "fallback-salt-change-in-prod";
+// In production this MUST be set — a missing salt makes IP hashes reversible.
+// Throws at startup so the misconfiguration is caught immediately, not silently.
+const SALT = process.env.IP_HASH_SALT;
+if (!SALT && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "FATAL: IP_HASH_SALT environment variable is required in production. " +
+    "Generate with: openssl rand -hex 32"
+  );
+}
+const EFFECTIVE_SALT = SALT ?? "dev-only-non-secret-salt";
 
 /**
  * hashIP — SHA-256 hash of IP + salt
@@ -10,7 +19,7 @@ const SALT = process.env.IP_HASH_SALT ?? "fallback-salt-change-in-prod";
  */
 export function hashIP(ip: string): string {
   return createHash("sha256")
-    .update(ip + SALT)
+    .update(ip + EFFECTIVE_SALT)
     .digest("hex");
 }
 

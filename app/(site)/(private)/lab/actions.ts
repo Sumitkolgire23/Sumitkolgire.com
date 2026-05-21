@@ -76,14 +76,19 @@ export async function saveLabEntry(
   try {
     const { supabase, user } = await getAuthClient();
 
+    // Build a partial update — only include fields that were explicitly provided.
+    // This prevents an autosave from clobbering tags managed by MetadataPanel.
+    const update: Record<string, unknown> = {};
+    if (payload.title    !== undefined) update.title      = payload.title;
+    if (payload.content  !== undefined) update.content    = payload.content;
+    if (payload.tags     !== undefined) update.tags       = payload.tags;
+    if (payload.wordCount !== undefined) update.word_count = payload.wordCount;
+
+    if (Object.keys(update).length === 0) return { ok: true };
+
     const { error } = await supabase
       .from("lab_entries")
-      .update({
-        title:      payload.title      ?? "",
-        content:    payload.content    ?? {},
-        tags:       payload.tags       ?? [],
-        word_count: payload.wordCount  ?? 0,
-      })
+      .update(update)
       .eq("id", id)
       .eq("user_id", user.id);   // extra RLS guard
 
@@ -99,18 +104,65 @@ export async function saveLabEntry(
   }
 }
 
-/** Update visibility / type from the metadata panel */
+/** Update visibility / type / mood / tags from the metadata panel */
 export async function updateLabEntryMeta(
   id: string,
-  payload: { visibility?: string; type?: string; pinned?: boolean }
+  payload: {
+    visibility?: string;
+    type?: string;
+    mood?: string;
+    pinned?: boolean;
+    tags?: string[];
+  }
 ): Promise<{ ok: boolean }> {
   try {
     const { supabase, user } = await getAuthClient();
+
+    // Whitelist every field explicitly — never pass raw client payload to update().
+    // This prevents mass-assignment (e.g. a client sending { user_id: '...' }).
+    const ALLOWED_VISIBILITY = ["private", "public", "unlisted"] as const;
+    const ALLOWED_TYPES = ["log", "reflection", "experiment", "breakthrough", "research", "idea", "reference", "decision"] as const;
+    const ALLOWED_MOODS = ["stillness", "chaos", "breakthrough", "reflection", ""] as const;
+
+    const safe: Record<string, unknown> = {};
+
+    if (payload.visibility !== undefined) {
+      if (!ALLOWED_VISIBILITY.includes(payload.visibility as typeof ALLOWED_VISIBILITY[number])) {
+        return { ok: false };
+      }
+      safe.visibility = payload.visibility;
+    }
+    if (payload.type !== undefined) {
+      if (!ALLOWED_TYPES.includes(payload.type as typeof ALLOWED_TYPES[number])) {
+        return { ok: false };
+      }
+      safe.type = payload.type;
+    }
+    if (payload.mood !== undefined) {
+      if (!ALLOWED_MOODS.includes(payload.mood as typeof ALLOWED_MOODS[number])) {
+        return { ok: false };
+      }
+      safe.mood = payload.mood;
+    }
+    if (payload.pinned !== undefined) {
+      safe.pinned = Boolean(payload.pinned);
+    }
+    if (payload.tags !== undefined) {
+      // Sanitize tags: lowercase strings, no special chars, max 20 tags, max 32 chars each
+      safe.tags = (Array.isArray(payload.tags) ? payload.tags : [])
+        .slice(0, 20)
+        .map((t) => String(t).toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 32))
+        .filter(Boolean);
+    }
+
+    if (Object.keys(safe).length === 0) return { ok: true };
+
     await supabase
       .from("lab_entries")
-      .update(payload)
+      .update(safe)
       .eq("id", id)
       .eq("user_id", user.id);
+
     revalidatePath("/lab");
     return { ok: true };
   } catch {

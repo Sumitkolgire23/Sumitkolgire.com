@@ -320,7 +320,7 @@ body::after {
 .vis-public  { color: var(--moss); }
 
 /* ── EDITOR VIEW ── */
-.editor-view { flex: 1; display: flex; flex-direction: column; padding: 32px 40px; max-width: 800px; margin: 0 auto; width: 100%; }
+.editor-view { flex: 1; display: flex; flex-direction: column; padding: 32px 40px; max-width: 800px; margin: 0 auto; width: 100%; min-height: 0; height: 100%; }
 .editor-back { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
 .editor-breadcrumb { font-family: var(--mono); font-size: 11px; color: var(--text3); }
 

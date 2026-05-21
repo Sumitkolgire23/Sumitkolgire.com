@@ -48,6 +48,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Dead files replaced by new equivalents
+proxy.ts
+
 # Documentation
 Documentation/
 .vercel

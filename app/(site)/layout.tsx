@@ -33,7 +33,7 @@ const geist = Geist({
 // ── METADATA ──────────────────────────────────────────────
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://sumitkolgire.com"
   ),
   title: {
     default: "Sumit Kolgire — AI/ML Engineer",
@@ -81,6 +81,10 @@ export default function RootLayout({
       className={`${instrumentSerif.variable} ${geistMono.variable} ${geist.variable}`}
     >
       <body className="antialiased">
+        {/* Skip link — WCAG 2.4.1: bypass navigation for keyboard/screen reader users */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <DarkPageEffects />
         <SiteNavbar />
         <main id="main-content" tabIndex={-1}>

@@ -12,6 +12,9 @@ export function DarkPageEffects() {
     const bar = barRef.current;
     if (!cursor || !bar) return;
 
+    // Don't run cursor animation for users who prefer reduced motion
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     let mx = 0, my = 0, cx = 0, cy = 0;
     let animId: number;
 
@@ -25,6 +28,8 @@ export function DarkPageEffects() {
     };
     animId = requestAnimationFrame(loop);
     document.addEventListener("mousemove", onMove);
+    // Signal CSS that cursor JS is active — enables cursor:none safely
+    document.body.classList.add("cursor-ready");
 
     // Grow on interactive elements
     const grow = () => cursor.classList.add("grow");

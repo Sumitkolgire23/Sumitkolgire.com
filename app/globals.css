@@ -84,6 +84,16 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Respect user's motion preference — prevents vestibular issues */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ── BODY ───────────────────────────────────────────────── */
 body {
   background: var(--bg);
@@ -92,7 +102,35 @@ body {
   line-height: 1.7;
   overflow-x: hidden;
   min-height: 100vh;
+  /* cursor:none only applied after custom cursor JS confirms it loaded.
+     Avoids accessibility failure for users who rely on the OS cursor. */
+}
+
+/* Applied by DarkPageEffects client component once cursor JS is ready */
+body.cursor-ready {
   cursor: none;
+}
+
+/* ── SKIP LINK ─────────────────────────────────────────── */
+/* Visible only on keyboard focus \u2014 WCAG 2.4.1 compliance */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 12px;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--seal);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  border-radius: 0 0 6px 6px;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 /* Subtle ruled lines — dark version */

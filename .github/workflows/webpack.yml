@@ -1,28 +1,45 @@
-name: NodeJS with Webpack
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main, dev]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 jobs:
-  build:
+  quality:
+    name: Type check · Lint · Build
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-    - name: Build
-      run: |
-        npm install
-        npx webpack
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript — type check
+        run: npx tsc --noEmit
+
+      - name: ESLint — lint
+        run: npm run lint
+
+      - name: Next.js — build
+        env:
+          # Stub required env vars so the build doesn't crash
+          # Real secrets live in Vercel — never commit them here
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: "https://sumitkolgire.com"
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: "production"
+          NEXT_PUBLIC_SANITY_API_VERSION: "2024-01-01"
+          # IP_HASH_SALT not needed in CI build (guard only throws in runtime)
+          IP_HASH_SALT: "ci-build-stub"
+        run: npm run build

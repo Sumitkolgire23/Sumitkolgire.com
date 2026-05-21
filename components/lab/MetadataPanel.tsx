@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { updateLabEntryMeta, deleteLabEntry } from "@/app/(site)/(private)/lab/actions";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +12,8 @@ interface MetadataPanelProps {
   initialMood?: string;
   initialTags?: string[];
   initialWordCount?: number;
+  /** Live word count driven by LabEditor via shared state (optional) */
+  wordCount?: number;
   wordGoal?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -32,19 +34,29 @@ export default function MetadataPanel({
   initialMood       = "",
   initialTags       = [],
   initialWordCount  = 0,
+  wordCount,          // live count from LabEditor (if provided)
   wordGoal          = 500,
   createdAt, updatedAt,
 }: MetadataPanelProps) {
-  const [type, setType]           = useState(initialType);
-  const [mood, setMood]           = useState(initialMood);
+  const [type, setType]             = useState(initialType);
+  const [mood, setMood]             = useState(initialMood);
   const [visibility, setVisibility] = useState(initialVisibility);
-  const [tags, setTags]           = useState<string[]>(initialTags);
-  const [tagInput, setTagInput]   = useState("");
+  const [tags, setTags]             = useState<string[]>(initialTags);
+  const [tagInput, setTagInput]     = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const tagDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const update = (payload: object) =>
+  const update = (payload: Parameters<typeof updateLabEntryMeta>[1]) =>
     startTransition(() => { void updateLabEntryMeta(entryId, payload); });
+
+  // Debounced tag update — prevents race conditions when tags are added/removed rapidly
+  const updateTagsDebounced = (nextTags: string[]) => {
+    if (tagDebounceRef.current) clearTimeout(tagDebounceRef.current);
+    tagDebounceRef.current = setTimeout(() => {
+      update({ tags: nextTags });
+    }, 350);
+  };
 
   const addTag = () => {
     const t = tagInput.trim().toLowerCase().replace(/^#/, "");
@@ -52,12 +64,12 @@ export default function MetadataPanel({
     const next = [...tags, t];
     setTags(next);
     setTagInput("");
-    update({ tags: next });
+    updateTagsDebounced(next);
   };
   const removeTag = (t: string) => {
     const next = tags.filter((x) => x !== t);
     setTags(next);
-    update({ tags: next });
+    updateTagsDebounced(next);
   };
 
   const handleDelete = () => {
@@ -68,7 +80,8 @@ export default function MetadataPanel({
     });
   };
 
-  const goalPct = Math.min(100, Math.round((initialWordCount / wordGoal) * 100));
+  const goalPct = Math.min(100, Math.round(((wordCount ?? initialWordCount) / wordGoal) * 100));
+  const displayWordCount = wordCount ?? initialWordCount;
 
   return (
     <aside className="lab-rightpanel">
@@ -153,7 +166,7 @@ export default function MetadataPanel({
         <div className="rp-label">Writing goal</div>
         <div className="word-goal-wrap">
           <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text2)" }}>
-            {initialWordCount} / {wordGoal} words today
+            {displayWordCount} / {wordGoal} words today
           </div>
           <div className="goal-bar">
             <div className="goal-fill" style={{ width: `${goalPct}%` }} />
@@ -173,8 +186,16 @@ export default function MetadataPanel({
 
       {/* Actions */}
       <div className="rp-section">
-        <button className="promote-to-sanity" type="button" disabled={isPending}>
-          <span>↑</span> Promote to public draft
+        <button
+          className="promote-to-sanity"
+          type="button"
+          disabled={isPending || visibility === "public"}
+          onClick={() => {
+            setVisibility("public");
+            update({ visibility: "public" });
+          }}
+        >
+          <span>↑</span> {visibility === "public" ? "Already public" : "Promote to public draft"}
         </button>
         <button className="delete-entry-btn" type="button" onClick={handleDelete} disabled={isPending}>
           Delete entry

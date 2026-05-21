@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import LabEditor from "@/components/lab/LabEditor";
 import MetadataPanel from "@/components/lab/MetadataPanel";
+import { requireOwner } from "@/lib/auth-guard";
 
 const SECTION_MAP: Record<string, string> = {
   diary: "Daily Diary", research: "Research",
@@ -19,10 +20,15 @@ export default async function LabEntryPage({
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
 
+  // Verify ownership — prevents IDOR (any auth'd user reading another's entry by UUID)
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
   const { data: entry } = await supabase
     .from("lab_entries")
-    .select("*")
+    .select("id, title, content, tags, type, mood, visibility, word_count, created_at, updated_at")
     .eq("id", id)
+    .eq("user_id", user.id)   // ← ownership guard: users can only read their own entries
     .is("deleted_at", null)
     .single();
 
