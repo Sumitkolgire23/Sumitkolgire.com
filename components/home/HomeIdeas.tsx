@@ -66,7 +66,7 @@ export function HomeIdeas({
                 return (
                   <div
                     key={idea.id}
-                    className="idea-card"
+                    className={`idea-card ${idea.ripeness === "ripe" ? "border-pulse-ripe" : ""}`}
                     style={{
                       background: "var(--bg)",
                       border: "1px solid var(--border)",
