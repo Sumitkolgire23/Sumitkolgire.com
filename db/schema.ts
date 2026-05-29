@@ -76,6 +76,7 @@ export const resources = pgTable(
     title: text("title").notNull(),
     url: text("url").notNull(),
     domain: text("domain").notNull(), // AI | ML | Systems | Philosophy | Tools | Web | Research
+    type: text("type"), // Added missing type column
     note: text("note").notNull(), // one-line "why this matters"
     addedAt: timestamp("added_at").defaultNow().notNull(),
     isActive: boolean("is_active").default(true).notNull(),

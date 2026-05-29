@@ -208,8 +208,6 @@ async function _getPublicResources(): Promise<PublicResource[]> {
   try {
     const { data, error } = await supabase
       .from("resources")
-      // RED TEAM AUDIT NOTE [L-9]: The `type` column is queried here but does not exist
-      // in the Drizzle schema (`db/schema.ts`). Ensure Supabase table has this column.
       .select("id, title, url, note, domain, type, created_at")
       .eq("is_public", true)
       .is("deleted_at", null)
