@@ -61,9 +61,7 @@ export function SiteNavbar() {
             }}
           >
             {/* SVG seal */}
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style={{ flexShrink: 0, transition: "transform 0.4s" }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "rotate(-12deg) scale(1.08)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "")}
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="seal-stamp-rotate" style={{ flexShrink: 0 }}
             >
               <circle cx="16" cy="16" r="15" stroke="#c41e3a" strokeWidth="1"/>
               <circle cx="16" cy="16" r="11.5" stroke="#c41e3a" strokeWidth="0.5"/>
@@ -94,6 +92,7 @@ export function SiteNavbar() {
                 <MagneticButton strength={0.25}>
                   <Link
                     href={href}
+                    className="underline-draw"
                     style={{
                       fontFamily: "var(--mono)",
                       fontSize: "11px",
@@ -150,7 +149,7 @@ export function SiteNavbar() {
         className={`show-mobile mobile-drawer ${mobileOpen ? "open" : ""}`}
       >
         {NAV_LINKS.map(({ href, label }) => (
-          <Link key={href} href={href}>
+          <Link key={href} href={href} className="underline-draw">
             {label}
           </Link>
         ))}
