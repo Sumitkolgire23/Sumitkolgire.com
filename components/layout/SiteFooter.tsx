@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -37,7 +38,7 @@ export function SiteFooter() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="footer-link"
+                  className="footer-link underline-draw"
                   style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)", textDecoration: "none", letterSpacing: "0.06em", transition: "color 0.2s" }}
                 >
                   {label}
@@ -50,7 +51,7 @@ export function SiteFooter() {
 
       {/* Centre seal */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="seal-stamp-rotate" style={{ cursor: "pointer" }}>
           <circle cx="20" cy="20" r="19" stroke="rgba(196,30,58,.3)" strokeWidth="1"/>
           <circle cx="20" cy="20" r="15" stroke="rgba(196,30,58,.15)" strokeWidth=".5"/>
           <text fontFamily="'Instrument Serif',serif" fontSize="8" fill="rgba(196,30,58,.5)" textAnchor="middle" x="20" y="17" fontStyle="italic">SK</text>
@@ -71,15 +72,17 @@ export function SiteFooter() {
               { href: "https://linkedin.com/in/sumitkolgire",   label: "LinkedIn" },
             ].map(({ href, label }) => (
               <li key={href}>
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-link"
-                  style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)", textDecoration: "none", letterSpacing: "0.06em", transition: "color 0.2s" }}
-                >
-                  {label} ↗
-                </a>
+                <MagneticButton strength={0.2}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-link underline-draw social-link-glow"
+                    style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)", textDecoration: "none", letterSpacing: "0.06em", transition: "color 0.2s", display: "inline-block", padding: "2px 6px" }}
+                  >
+                    {label} ↗
+                  </a>
+                </MagneticButton>
               </li>
             ))}
           </ul>
