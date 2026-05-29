@@ -7,6 +7,8 @@ import { TypedIdentity } from "@/components/home/TypedIdentity";
 import SplitType from "split-type";
 import { gsap } from "gsap";
 import { getFeatureFlags } from "@/lib/features";
+import { MagneticButton } from "@/components/ui/MagneticButton";
+import { GlowCard } from "@/components/ui/GlowCard";
 
 export function HomeHero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -214,77 +216,70 @@ export function HomeHero() {
           className="reveal"
           style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}
         >
-          <Link
-            href="/articles"
-            style={{
-              fontFamily: "var(--mono)",
-              fontSize: "11px",
-              color: "white",
-              background: "var(--seal)",
-              padding: "11px 26px",
-              textDecoration: "none",
-              letterSpacing: ".08em",
-              transition: "all .25s",
-              display: "inline-block",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.background = "#a01830";
-              (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.background = "var(--seal)";
-              (e.currentTarget as HTMLElement).style.transform = "";
-            }}
-          >
-            Read the writing
-          </Link>
-          <Link
-            href="/projects"
-            style={{
-              fontFamily: "var(--mono)",
-              fontSize: "11px",
-              color: "var(--text3)",
-              padding: "10px 26px",
-              border: "1px solid var(--border3)",
-              textDecoration: "none",
-              letterSpacing: ".08em",
-              transition: "all .25s",
-              display: "inline-block",
-              background: "transparent",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--text3)";
-              (e.currentTarget as HTMLElement).style.color = "var(--text)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--border3)";
-              (e.currentTarget as HTMLElement).style.color = "var(--text3)";
-            }}
-          >
-            View projects
-          </Link>
+          <MagneticButton strength={0.25}>
+            <Link
+              href="/articles"
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: "11px",
+                color: "white",
+                background: "var(--seal)",
+                padding: "11px 26px",
+                textDecoration: "none",
+                letterSpacing: ".08em",
+                transition: "all .25s",
+                display: "inline-block",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = "#a01830";
+                (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = "var(--seal)";
+                (e.currentTarget as HTMLElement).style.transform = "";
+              }}
+            >
+              Read the writing
+            </Link>
+          </MagneticButton>
+          <MagneticButton strength={0.25}>
+            <Link
+              href="/projects"
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: "11px",
+                color: "var(--text3)",
+                padding: "10px 26px",
+                border: "1px solid var(--border3)",
+                textDecoration: "none",
+                letterSpacing: ".08em",
+                transition: "all .25s",
+                display: "inline-block",
+                background: "transparent",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--text3)";
+                (e.currentTarget as HTMLElement).style.color = "var(--text)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--border3)";
+                (e.currentTarget as HTMLElement).style.color = "var(--text3)";
+              }}
+            >
+              View projects
+            </Link>
+          </MagneticButton>
         </div>
       </div>
 
       {/* ── RIGHT — Featured Card ──────────────────────── */}
       <div style={{ position: "relative", zIndex: 2 }} className="reveal">
-        <div
+        <GlowCard
           className="featured-card"
           style={{
-            background: "var(--bg2)",
-            border: "1px solid var(--border)",
             padding: "28px",
             position: "relative",
-            transition: "transform .4s ease, border-color .3s",
             cursor: "pointer",
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.transform = "translate(-3px,-3px)";
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--border2)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.transform = "";
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
           }}
         >
           {/* Offset shadow */}
@@ -330,7 +325,7 @@ export function HomeHero() {
             <span style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)" }}>April 22, 2025</span>
             <Link href="/perspectives" style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--seal)", textDecoration: "none" }}>8 min read →</Link>
           </div>
-        </div>
+        </GlowCard>
       </div>
 
       {/* Responsive override */}
