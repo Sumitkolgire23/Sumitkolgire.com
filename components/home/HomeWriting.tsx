@@ -73,7 +73,7 @@ export function HomeWriting({ articles }: { articles: Article[] }) {
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1px", background: "var(--border)", border: "1px solid var(--border)" }}
         >
           {/* Wide featured article */}
-          <GlowCard style={{ gridColumn: "span 2" }}>
+          <GlowCard className="article-card-lift" style={{ gridColumn: "span 2" }}>
             <Link
               href={`/articles/${wide.slug}`}
               style={{ display: "block", padding: "28px", cursor: "pointer", textDecoration: "none", color: "inherit", position: "relative", zIndex: 2 }}
@@ -99,7 +99,7 @@ export function HomeWriting({ articles }: { articles: Article[] }) {
           {rest.map(article => {
             const { label, color } = typeLabel(article.tags);
             return (
-              <GlowCard key={article.slug}>
+              <GlowCard key={article.slug} className="article-card-lift">
                 <Link
                   href={`/articles/${article.slug}`}
                   style={{ display: "block", padding: "28px", textDecoration: "none", color: "inherit", position: "relative", zIndex: 2 }}
