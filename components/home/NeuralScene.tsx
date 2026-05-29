@@ -6,6 +6,7 @@ import * as THREE from "three";
 
 function NeuralNetwork() {
   const groupRef = useRef<THREE.Group>(null);
+  const linesRef = useRef<THREE.LineSegments>(null);
 
   // Generate 25 nodes inside a sphere
   const nodes = useMemo(() => {
@@ -35,25 +36,32 @@ function NeuralNetwork() {
     return temp;
   }, []);
 
-  // Compute connections (lines) between close nodes
-  const lineGeometry = useMemo(() => {
-    const vertices: number[] = [];
+  // Precompute indices of nodes that are close to each other
+  const connections = useMemo(() => {
+    const temp = [];
     const threshold = 1.6;
-
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dist = nodes[i].position.distanceTo(nodes[j].position);
         if (dist < threshold) {
-          vertices.push(nodes[i].position.x, nodes[i].position.y, nodes[i].position.z);
-          vertices.push(nodes[j].position.x, nodes[j].position.y, nodes[j].position.z);
+          temp.push({ i, j });
         }
       }
     }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-    return geometry;
+    return temp;
   }, [nodes]);
+
+  // Float array for line coordinates
+  const linePositions = useMemo(() => {
+    return new Float32Array(connections.length * 2 * 3); // 2 vertices per line, 3 coords per vertex
+  }, [connections]);
+
+  // Instantiate BufferGeometry once
+  const lineGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+    return geometry;
+  }, [linePositions]);
 
   // Handle gentle drift and mouse interaction rotation in RAF loop
   useFrame((state) => {
@@ -81,8 +89,37 @@ function NeuralNetwork() {
           node.position.y + Math.cos(time * node.speed + node.phaseY) * 0.06,
           node.position.z + Math.sin(time * node.speed + node.phaseZ) * 0.04
         );
+        // Pulse size slightly to look alive and transmitting data
+        const pulse = 1.0 + Math.sin(time * 2.0 + node.phaseX) * 0.15;
+        mesh.scale.setScalar(pulse);
       }
     });
+
+    // Update lines positions dynamically to follow drifting nodes
+    if (linesRef.current) {
+      const lineGeom = linesRef.current.geometry;
+      const posAttr = lineGeom.getAttribute("position") as THREE.BufferAttribute;
+      const array = posAttr.array as Float32Array;
+
+      connections.forEach((conn, index) => {
+        const meshI = children[conn.i] as THREE.Mesh;
+        const meshJ = children[conn.j] as THREE.Mesh;
+
+        if (meshI && meshJ) {
+          const baseIdx = index * 6;
+          // Start point
+          array[baseIdx] = meshI.position.x;
+          array[baseIdx + 1] = meshI.position.y;
+          array[baseIdx + 2] = meshI.position.z;
+          // End point
+          array[baseIdx + 3] = meshJ.position.x;
+          array[baseIdx + 4] = meshJ.position.y;
+          array[baseIdx + 5] = meshJ.position.z;
+        }
+      });
+
+      posAttr.needsUpdate = true;
+    }
   });
 
   return (
@@ -96,7 +133,7 @@ function NeuralNetwork() {
       ))}
 
       {/* Connection Lines */}
-      <lineSegments geometry={lineGeometry}>
+      <lineSegments ref={linesRef} geometry={lineGeometry}>
         <lineBasicMaterial color="#c41e3a" transparent opacity={0.22} />
       </lineSegments>
     </group>
