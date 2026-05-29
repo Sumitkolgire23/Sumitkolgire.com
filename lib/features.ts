@@ -34,6 +34,16 @@ export function getFeatureFlags(): FeatureFlags {
   };
 }
 
+let reducedMotionQuery: MediaQueryList | null = null;
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  if (!reducedMotionQuery) {
+    reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  }
+  return reducedMotionQuery.matches;
+}
+
 function getFlag(key: keyof FeatureFlags, defaultValue: boolean): boolean {
   try {
     // 1. Check environment variables
@@ -48,7 +58,7 @@ function getFlag(key: keyof FeatureFlags, defaultValue: boolean): boolean {
     if (localVal === "true") return true;
 
     // 3. Fallback to prefers-reduced-motion check for visual animations
-    if (key !== "smoothScroll" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (key !== "smoothScroll" && prefersReducedMotion()) {
       return false;
     }
   } catch (e) {
@@ -57,3 +67,4 @@ function getFlag(key: keyof FeatureFlags, defaultValue: boolean): boolean {
 
   return defaultValue;
 }
+
