@@ -81,8 +81,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
               }}
             >
               {/* Bottom bar accent on hover */}
-              <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "2px", background: "var(--seal)", transform: "scaleX(0)", transformOrigin: "left", transition: "transform .35s" }}
-                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.transform = "scaleX(1)")} />
+              <div className="bottom-accent" style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "2px", background: "var(--seal)", transform: "scaleX(0)", transformOrigin: "left", transition: "transform .35s" }} />
 
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--moss)", letterSpacing: ".07em", marginBottom: "16px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--moss)", animation: "pulse 2.5s ease-in-out infinite", flexShrink: 0, display: "inline-block" }} />
@@ -150,6 +149,9 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
       </div>
 
       <style>{`
+        #projects .project-aurora-glow:hover .bottom-accent {
+          transform: scaleX(1) !important;
+        }
         @media (max-width: 1100px) {
           #projects .proj-grid { grid-template-columns: 1fr 1fr !important; }
           #projects .proj-tall { grid-row: span 1 !important; }
