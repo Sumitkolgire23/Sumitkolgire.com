@@ -682,6 +682,12 @@ html.lenis, html.lenis body {
   -webkit-text-fill-color: transparent;
   animation: gradient-shift 4.5s ease infinite;
 }
+.gradient-text .char, .gradient-text .word {
+  background: inherit;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 @keyframes gradient-shift {
   0%   { background-position: 0% center; }
   50%  { background-position: 100% center; }
