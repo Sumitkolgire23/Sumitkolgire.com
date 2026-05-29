@@ -73,20 +73,7 @@ export function HomeIdeas({
                       padding: "16px",
                       cursor: "pointer",
                       position: "relative",
-                      transition: "transform .3s, box-shadow .3s, border-color .3s",
                       marginTop: `${offsets[i % 4]}px`,
-                    }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.transform = "translateY(-3px)";
-                      el.style.borderColor = "var(--border3)";
-                      el.style.boxShadow = "0 8px 32px rgba(0,0,0,.4)";
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.transform = "";
-                      el.style.borderColor = "var(--border)";
-                      el.style.boxShadow = "";
                     }}
                   >
                     {/* Top accent bar */}
