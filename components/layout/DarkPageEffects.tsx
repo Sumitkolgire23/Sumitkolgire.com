@@ -135,9 +135,11 @@ export function DarkPageEffects() {
       ctx.scale(dpr, dpr);
     };
 
+    let isResizeListenerAdded = false;
     if (flags.cursorTrail && canvas && !window.matchMedia("(pointer: coarse)").matches) {
       resize();
       window.addEventListener("resize", resize);
+      isResizeListenerAdded = true;
     }
 
     const loop = () => {
@@ -216,17 +218,22 @@ export function DarkPageEffects() {
     // Signal CSS that custom cursor JS is ready
     document.body.classList.add("cursor-ready");
 
-    // Grow cursor on interactive elements
-    const grow = () => cursor.classList.add("grow");
-    const shrink = () => cursor.classList.remove("grow");
+    // Grow cursor on interactive elements via event delegation
     const selectors = "a, button, .diary-row, .proj-card, .idea-card, .entry-card, .featured-card";
-    const attachListeners = () => {
-      document.querySelectorAll(selectors).forEach((el) => {
-        el.addEventListener("mouseenter", grow);
-        el.addEventListener("mouseleave", shrink);
-      });
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && target.closest(selectors)) {
+        cursor.classList.add("grow");
+      }
     };
-    attachListeners();
+    const onMouseOut = (e: MouseEvent) => {
+      const relatedTarget = e.relatedTarget as HTMLElement;
+      if (!relatedTarget || !relatedTarget.closest(selectors)) {
+        cursor.classList.remove("grow");
+      }
+    };
+    document.addEventListener("mouseover", onMouseOver);
+    document.addEventListener("mouseout", onMouseOut);
 
     // Reading progress bar scroll listener (Safari & Firefox Fallback)
     let onScroll: (() => void) | null = null;
@@ -246,7 +253,7 @@ export function DarkPageEffects() {
     }
 
     // Scroll-reveal triggers
-    const triggers: any[] = [];
+    const triggers: ScrollTrigger[] = [];
     const revealsCleanups: (() => void)[] = [];
 
     if (!flags.scrollAnimations) {
@@ -346,10 +353,14 @@ export function DarkPageEffects() {
       cancelAnimationFrame(animId);
       document.removeEventListener("mousemove", onMove);
       window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("mouseover", onMouseOver);
+      document.removeEventListener("mouseout", onMouseOut);
       if (onScroll) {
         window.removeEventListener("scroll", onScroll);
       }
-      window.removeEventListener("resize", resize);
+      if (isResizeListenerAdded) {
+        window.removeEventListener("resize", resize);
+      }
       triggers.forEach((trigger) => trigger.kill());
       revealsCleanups.forEach((cleanup) => cleanup());
     };
