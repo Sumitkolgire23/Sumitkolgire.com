@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { SiteNavbar } from "@/components/layout/SiteNavbar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { DarkPageEffects } from "@/components/layout/DarkPageEffects";
+import { SmoothScrollProvider } from "@/components/layout/SmoothScrollProvider";
 
 // ── FONTS ─────────────────────────────────────────────────
 // Self-hosted via next/font — zero FOUT, zero CLS
@@ -85,12 +86,14 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <DarkPageEffects />
-        <SiteNavbar />
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <SiteFooter />
+        <SmoothScrollProvider>
+          <DarkPageEffects />
+          <SiteNavbar />
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+          <SiteFooter />
+        </SmoothScrollProvider>
       </body>
     </html>
   );
