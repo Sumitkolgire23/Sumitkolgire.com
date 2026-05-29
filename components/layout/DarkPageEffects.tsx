@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getFeatureFlags } from "@/lib/features";
 
 /** Dark custom cursor, reading-progress bar, and canvas ink trail — mounted once globally. */
 export function DarkPageEffects() {
@@ -13,6 +16,11 @@ export function DarkPageEffects() {
     const canvas = canvasRef.current;
     const bar = barRef.current;
     if (!cursor || !bar) return;
+
+    const flags = getFeatureFlags();
+
+    // Register ScrollTrigger safely
+    gsap.registerPlugin(ScrollTrigger);
 
     // Don't run custom cursor/animations for users who prefer reduced motion
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -28,8 +36,8 @@ export function DarkPageEffects() {
       mx = e.clientX;
       my = e.clientY;
 
-      // Add points to canvas trail if not on mobile/touch devices
-      if (canvas && !window.matchMedia("(pointer: coarse)").matches) {
+      // Add points to canvas trail if flag is active and not on mobile/touch devices
+      if (flags.cursorTrail && canvas && !window.matchMedia("(pointer: coarse)").matches) {
         const now = Date.now();
         const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
         const elapsed = Math.max(1, now - lastTime);
@@ -69,7 +77,7 @@ export function DarkPageEffects() {
       ctx.scale(dpr, dpr);
     };
 
-    if (canvas && !window.matchMedia("(pointer: coarse)").matches) {
+    if (flags.cursorTrail && canvas && !window.matchMedia("(pointer: coarse)").matches) {
       resize();
       window.addEventListener("resize", resize);
     }
@@ -82,7 +90,7 @@ export function DarkPageEffects() {
       cursor.style.top = cy + "px";
 
       // 2. Draw canvas ink trail
-      if (canvas && ctx && !window.matchMedia("(pointer: coarse)").matches) {
+      if (flags.cursorTrail && canvas && ctx && !window.matchMedia("(pointer: coarse)").matches) {
         ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
         const now = Date.now();
 
@@ -146,25 +154,54 @@ export function DarkPageEffects() {
     };
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    // Scroll-reveal via IntersectionObserver
-    const ro = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            ro.unobserve(e.target);
+    // Scroll-reveal triggers
+    const triggers: any[] = [];
+
+    if (!flags.scrollAnimations) {
+      // Fallback: immediately show all content
+      document.querySelectorAll(".reveal").forEach((el) => {
+        el.classList.add("in");
+      });
+    } else {
+      const reveals = gsap.utils.toArray(".reveal");
+      reveals.forEach((el: any) => {
+        let delay = 0;
+        if (el.classList.contains("rd1")) delay = 0.08;
+        else if (el.classList.contains("rd2")) delay = 0.16;
+        else if (el.classList.contains("rd3")) delay = 0.24;
+
+        // Disable CSS transitions to prevent lag interpolation with GSAP updates
+        gsap.set(el, { transition: "none" });
+
+        const anim = gsap.fromTo(
+          el,
+          { opacity: 0, y: 22 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            delay: delay,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 92%",
+              toggleActions: "play none none none",
+            },
           }
-        }),
-      { threshold: 0.07, rootMargin: "0px 0px -30px 0px" }
-    );
-    document.querySelectorAll(".reveal").forEach((el) => ro.observe(el));
+        );
+
+        if (anim.scrollTrigger) {
+          triggers.push(anim.scrollTrigger);
+        }
+      });
+    }
 
     return () => {
       cancelAnimationFrame(animId);
       document.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", resize);
-      ro.disconnect();
+      triggers.forEach((trigger) => trigger.kill());
     };
   }, []);
 
