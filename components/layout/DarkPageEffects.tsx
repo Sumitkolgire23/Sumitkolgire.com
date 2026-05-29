@@ -33,6 +33,63 @@ export function DarkPageEffects() {
     const points: { x: number; y: number; t: number; w: number }[] = [];
     let lastX = 0, lastY = 0, lastTime = Date.now();
 
+    // Konami code: Up, Up, Down, Down, Left, Right, Left, Right, B, A
+    const konamiCode = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    let konamiIndex = 0;
+    const splashParticles: { x: number; y: number; r: number; maxR: number; opacity: number; color: string; speed: number; angle: number }[] = [];
+
+    const triggerKonamiEgg = () => {
+      const cxVal = window.innerWidth / 2;
+      const cyVal = window.innerHeight / 2;
+      // Spawn wave of ink splashes radiating from center (Seal Red)
+      for (let i = 0; i < 45; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3.2 + 0.8;
+        const maxR = Math.random() * 60 + 20;
+        splashParticles.push({
+          x: cxVal,
+          y: cyVal,
+          r: 1,
+          maxR: maxR,
+          opacity: 0.8,
+          color: `rgba(196, 30, 58, ${Math.random() * 0.4 + 0.3})`,
+          speed: speed,
+          angle: angle
+        });
+      }
+      // Wabi-sabi deep dark ink washes
+      for (let i = 0; i < 35; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 2.4 + 0.5;
+        const maxR = Math.random() * 95 + 45;
+        splashParticles.push({
+          x: cxVal,
+          y: cyVal,
+          r: 1,
+          maxR: maxR,
+          opacity: 0.7,
+          color: `rgba(20, 20, 22, ${Math.random() * 0.5 + 0.3})`,
+          speed: speed,
+          angle: angle
+        });
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const key = e.key;
+      const targetKey = konamiCode[konamiIndex];
+      if (key.toLowerCase() === targetKey.toLowerCase()) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          triggerKonamiEgg();
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = key === "ArrowUp" ? 1 : 0;
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
     const onMove = (e: MouseEvent) => {
       mx = e.clientX;
       my = e.clientY;
@@ -93,6 +150,31 @@ export function DarkPageEffects() {
       // 2. Draw canvas ink trail
       if (flags.cursorTrail && canvas && ctx && !window.matchMedia("(pointer: coarse)").matches) {
         ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+
+        // Draw Konami splash particles
+        if (splashParticles.length > 0) {
+          for (let i = splashParticles.length - 1; i >= 0; i--) {
+            const p = splashParticles[i];
+            p.x += Math.cos(p.angle) * p.speed;
+            p.y += Math.sin(p.angle) * p.speed;
+            p.r += (p.maxR - p.r) * 0.08;
+            p.opacity -= 0.009;
+
+            if (p.opacity <= 0) {
+              splashParticles.splice(i, 1);
+              continue;
+            }
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color.replace(/[^,]+(?=\))/, p.opacity.toFixed(3));
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = p.color;
+            ctx.fill();
+          }
+          ctx.shadowBlur = 0;
+        }
+
         const now = Date.now();
 
         // Expire points older than 600ms
@@ -263,6 +345,7 @@ export function DarkPageEffects() {
     return () => {
       cancelAnimationFrame(animId);
       document.removeEventListener("mousemove", onMove);
+      window.removeEventListener("keydown", onKeyDown);
       if (onScroll) {
         window.removeEventListener("scroll", onScroll);
       }
