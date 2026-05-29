@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { GlowCard } from "@/components/ui/GlowCard";
+
 
 type Article = {
   slug: string;
@@ -71,49 +73,52 @@ export function HomeWriting({ articles }: { articles: Article[] }) {
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1px", background: "var(--border)", border: "1px solid var(--border)" }}
         >
           {/* Wide featured article */}
-          <Link
-            href={`/articles/${wide.slug}`}
-            style={{ gridColumn: "span 2", background: "var(--bg)", padding: "28px", cursor: "pointer", textDecoration: "none", color: "inherit", display: "block", position: "relative", overflow: "hidden", transition: "background .25s" }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg2)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg)"; }}
-          >
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", marginBottom: "12px", letterSpacing: ".09em", textTransform: "uppercase" }}>
-              <span style={{ width: "4px", height: "4px", borderRadius: "50%", background: wideType.color, display: "inline-block" }} />
-              {wideType.label}
-            </div>
-            <h3 style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1.42rem", lineHeight: 1.35, color: "var(--text)", marginBottom: "10px", fontWeight: 400 }}>{wide.title}</h3>
-            {wide.excerpt && <p style={{ fontSize: "13px", color: "var(--text2)", lineHeight: 1.72, marginBottom: "18px" }}>{wide.excerpt}</p>}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)" }}>{formatDate(wide.date)}</span>
-              {wide.tags.slice(0, 2).map(t => (
-                <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", background: "var(--bg3)", border: "1px solid var(--border)", padding: "1px 7px" }}>{t}</span>
-              ))}
-            </div>
-          </Link>
+          <GlowCard style={{ gridColumn: "span 2" }}>
+            <Link
+              href={`/articles/${wide.slug}`}
+              style={{ display: "block", padding: "28px", cursor: "pointer", textDecoration: "none", color: "inherit", position: "relative", zIndex: 2 }}
+            >
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", marginBottom: "12px", letterSpacing: ".09em", textTransform: "uppercase" }}>
+                <span style={{ width: "4px", height: "4px", borderRadius: "50%", background: wideType.color, display: "inline-block" }} />
+                {wideType.label}
+              </div>
+              <div>
+                <h3 className="underline-draw" style={{ display: "inline-block", fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1.42rem", lineHeight: 1.35, color: "var(--text)", marginBottom: "10px", fontWeight: 400 }}>{wide.title}</h3>
+              </div>
+              {wide.excerpt && <p style={{ fontSize: "13px", color: "var(--text2)", lineHeight: 1.72, marginBottom: "18px" }}>{wide.excerpt}</p>}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)" }}>{formatDate(wide.date)}</span>
+                {wide.tags.slice(0, 2).map(t => (
+                  <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", background: "var(--bg3)", border: "1px solid var(--border)", padding: "1px 7px" }}>{t}</span>
+                ))}
+              </div>
+            </Link>
+          </GlowCard>
 
           {/* Remaining articles */}
           {rest.map(article => {
             const { label, color } = typeLabel(article.tags);
             return (
-              <Link
-                key={article.slug}
-                href={`/articles/${article.slug}`}
-                style={{ background: "var(--bg)", padding: "28px", textDecoration: "none", color: "inherit", display: "block", position: "relative", overflow: "hidden", transition: "background .25s" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg2)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg)"; }}
-              >
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", marginBottom: "12px", letterSpacing: ".09em", textTransform: "uppercase" }}>
-                  <span style={{ width: "4px", height: "4px", borderRadius: "50%", background: color, display: "inline-block" }} />
-                  {label}
-                </div>
-                <h3 style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1.08rem", lineHeight: 1.35, color: "var(--text)", marginBottom: "10px", fontWeight: 400 }}>{article.title}</h3>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)" }}>{formatDate(article.date)}</span>
-                  {article.tags.slice(0, 1).map(t => (
-                    <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", background: "var(--bg3)", border: "1px solid var(--border)", padding: "1px 7px" }}>{t}</span>
-                  ))}
-                </div>
-              </Link>
+              <GlowCard key={article.slug}>
+                <Link
+                  href={`/articles/${article.slug}`}
+                  style={{ display: "block", padding: "28px", textDecoration: "none", color: "inherit", position: "relative", zIndex: 2 }}
+                >
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", marginBottom: "12px", letterSpacing: ".09em", textTransform: "uppercase" }}>
+                    <span style={{ width: "4px", height: "4px", borderRadius: "50%", background: color, display: "inline-block" }} />
+                    {label}
+                  </div>
+                  <div>
+                    <h3 className="underline-draw" style={{ display: "inline-block", fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1.08rem", lineHeight: 1.35, color: "var(--text)", marginBottom: "10px", fontWeight: 400 }}>{article.title}</h3>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)" }}>{formatDate(article.date)}</span>
+                    {article.tags.slice(0, 1).map(t => (
+                      <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", background: "var(--bg3)", border: "1px solid var(--border)", padding: "1px 7px" }}>{t}</span>
+                    ))}
+                  </div>
+                </Link>
+              </GlowCard>
             );
           })}
         </div>
