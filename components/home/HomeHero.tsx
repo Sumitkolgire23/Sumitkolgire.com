@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { TimeAwareGreeting } from "@/components/home/TimeAwareGreeting";
 import { TypedIdentity } from "@/components/home/TypedIdentity";
+import { NeuralHero3D } from "@/components/home/NeuralHero3D";
 import SplitType from "split-type";
 import { gsap } from "gsap";
 import { getFeatureFlags } from "@/lib/features";
@@ -17,9 +18,20 @@ export function HomeHero() {
     const el = titleRef.current;
     if (!el) return;
 
-    // Check feature flags
-    if (!getFeatureFlags().scrollAnimations) {
+    const section = el.closest("section");
+    const overline = section?.querySelector(".reveal-overline");
+    const typewriter = section?.querySelector(".reveal-typewriter");
+    const paragraph = section?.querySelector(".reveal-paragraph");
+    const ctas = section?.querySelector(".reveal-ctas");
+    const rightCol = section?.querySelector(".reveal-right");
+
+    if (!section || !overline || !typewriter || !paragraph || !ctas || !rightCol) return;
+
+    // Check feature flags & prefers-reduced-motion media query
+    const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!getFeatureFlags().scrollAnimations || reducedMotion) {
       el.style.opacity = "1";
+      gsap.set(section.querySelectorAll(".reveal"), { opacity: 1, y: 0 });
       return;
     }
 
@@ -45,6 +57,7 @@ export function HomeHero() {
 
     // Set initial displaced state
     gsap.set(chars, { y: "110%", opacity: 0 });
+    gsap.set([overline, typewriter, paragraph, ctas, rightCol], { opacity: 0, y: 24, transition: "none" });
 
     // Separate normal characters from the emphasis word characters
     const intelligentWord = el.querySelector("em");
@@ -61,13 +74,26 @@ export function HomeHero() {
 
     const tl = gsap.timeline({ delay: 0.2 });
 
-    tl.to(normalChars, {
-      y: "0%",
+    // 1. Overline fades/slides up
+    tl.to(overline, {
+      y: 0,
       opacity: 1,
-      duration: 0.7,
-      stagger: 0.02,
-      ease: "power3.out",
+      duration: 0.6,
+      ease: "power2.out",
     });
+
+    // 2. Headline characters cascade up
+    tl.to(
+      normalChars,
+      {
+        y: "0%",
+        opacity: 1,
+        duration: 0.7,
+        stagger: 0.015,
+        ease: "power3.out",
+      },
+      "-=0.3"
+    );
 
     // Stagger the intelligent word characters with custom overlay
     tl.to(
@@ -76,10 +102,47 @@ export function HomeHero() {
         y: "0%",
         opacity: 1,
         duration: 0.8,
-        stagger: 0.035,
+        stagger: 0.03,
         ease: "power3.out",
       },
+      "-=0.4"
+    );
+
+    // 3. Typewriter identity and body paragraph reveal
+    tl.to(
+      [typewriter, paragraph],
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: "power2.out",
+      },
       "-=0.45"
+    );
+
+    // 4. CTA buttons slide up
+    tl.to(
+      ctas,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out",
+      },
+      "-=0.3"
+    );
+
+    // 5. Right column (3D scene + Featured Card Stack) fades and slides in
+    tl.to(
+      rightCol,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power2.out",
+      },
+      "-=0.3"
     );
 
     return () => {
@@ -142,7 +205,7 @@ export function HomeHero() {
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Overline */}
         <div
-          className="reveal"
+          className="reveal reveal-overline"
           style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}
         >
           <div style={{ width: "24px", height: "1px", background: "var(--seal)" }} />
@@ -181,7 +244,7 @@ export function HomeHero() {
 
         {/* Dynamic Typewriter Identity */}
         <div
-          className="reveal"
+          className="reveal reveal-typewriter"
           style={{
             fontFamily: "var(--mono)",
             fontSize: "13px",
@@ -197,7 +260,7 @@ export function HomeHero() {
         </div>
 
         <p
-          className="reveal"
+          className="reveal reveal-paragraph"
           style={{
             fontSize: "15px",
             color: "var(--text2)",
@@ -213,7 +276,7 @@ export function HomeHero() {
         </p>
 
         <div
-          className="reveal"
+          className="reveal reveal-ctas"
           style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}
         >
           <MagneticButton strength={0.25}>
@@ -256,8 +319,19 @@ export function HomeHero() {
         </div>
       </div>
 
-      {/* ── RIGHT — Featured Card ──────────────────────── */}
-      <div style={{ position: "relative", zIndex: 2 }} className="reveal">
+      {/* ── RIGHT — 3D Scene and Featured Card Stack ──────────────────────── */}
+      <div
+        className="reveal reveal-right"
+        style={{
+          position: "relative",
+          zIndex: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: "28px",
+        }}
+      >
+        <NeuralHero3D />
+
         <GlowCard
           className="featured-card"
           style={{
@@ -315,12 +389,13 @@ export function HomeHero() {
       {/* Responsive override */}
       <style>{`
         @media (max-width: 1100px) {
-          #hero { grid-template-columns: 1fr !important; padding: 100px 28px 60px !important; gap: 44px !important; min-height: auto !important; }
+          #hero { grid-template-columns: 1fr !important; padding: 88px 28px 48px !important; gap: 40px !important; min-height: auto !important; }
         }
         @media (max-width: 680px) {
-          #hero { padding: 88px 20px 48px !important; }
+          #hero { padding: 72px 20px 36px !important; }
         }
       `}</style>
     </section>
   );
 }
+
