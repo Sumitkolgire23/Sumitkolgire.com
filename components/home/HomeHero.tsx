@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { TimeAwareGreeting } from "@/components/home/TimeAwareGreeting";
+import { TypedIdentity } from "@/components/home/TypedIdentity";
 
 export function HomeHero() {
   return (
@@ -70,7 +72,7 @@ export function HomeHero() {
               textTransform: "uppercase",
             }}
           >
-            AI · ML · System Design · Pune, India
+            <TimeAwareGreeting /> · AI · ML · System Design · Pune, India
           </span>
         </div>
 
@@ -84,7 +86,7 @@ export function HomeHero() {
             letterSpacing: "-.02em",
             color: "var(--text)",
             fontWeight: 400,
-            marginBottom: "16px",
+            marginBottom: "20px",
           }}
         >
           Building
@@ -94,17 +96,21 @@ export function HomeHero() {
           systems
         </h1>
 
+        {/* Dynamic Typewriter Identity */}
         <div
           className="reveal"
           style={{
             fontFamily: "var(--mono)",
-            fontSize: "11px",
+            fontSize: "13px",
             color: "var(--text3)",
-            letterSpacing: ".2em",
-            marginBottom: "22px",
+            letterSpacing: ".05em",
+            marginBottom: "24px",
+            minHeight: "26px", // prevent layout shift while typing
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          learn · build · document
+          I am a&nbsp;<span style={{ color: "var(--text)", fontWeight: 400 }}><TypedIdentity /></span>
         </div>
 
         <p
@@ -117,7 +123,7 @@ export function HomeHero() {
             marginBottom: "44px",
           }}
         >
-          I&apos;m Sumit Kolgire — a third-year AI/ML engineering student from Pune.
+          A third-year AI/ML engineering student from Pune.
           I write about multi-agent architectures, raw experiment failures,
           and the future of intelligence. No trend-chasing.
           Deep work, documented honestly.
