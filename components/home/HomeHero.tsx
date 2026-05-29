@@ -362,7 +362,7 @@ export function HomeHero() {
             </svg>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
             <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".15em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "7px" }}>
               <div style={{ width: "12px", height: "1px", background: "var(--text3)" }} />
               Featured perspective
