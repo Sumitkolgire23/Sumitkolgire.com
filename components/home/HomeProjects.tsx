@@ -57,6 +57,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
           <TiltCard className="reveal proj-tall" style={{ gridRow: "span 2" }}>
             <Link
               href={`/projects/${tall.slug}`}
+              className="project-aurora-glow"
               style={{
                 background: "var(--bg2)",
                 border: "1px solid var(--border)",
@@ -105,6 +106,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
             <TiltCard key={proj.slug} className={`reveal rd${(i % 2) + 1}`}>
               <Link
                 href={`/projects/${proj.slug}`}
+                className="project-aurora-glow"
                 style={{
                   background: "var(--bg2)",
                   border: "1px solid var(--border)",
