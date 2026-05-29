@@ -865,3 +865,70 @@ html.lenis, html.lenis body {
   }
 }
 
+/* ── SPRINT 3 MICRO-INTERACTIONS ────────────────────────── */
+
+/* CTA Glow and Scale */
+.cta-glow-scale {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.25s !important;
+}
+.cta-glow-scale:hover {
+  transform: scale(1.03) translateY(-1px) !important;
+  box-shadow: 0 0 20px rgba(196, 30, 58, 0.25);
+}
+
+/* Article Card Lift */
+.article-card-lift {
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.article-card-lift:hover {
+  transform: translateY(-1px);
+}
+
+/* Project Card Aurora Corner Glow */
+.project-aurora-glow {
+  position: relative;
+}
+.project-aurora-glow::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(196, 30, 58, 0.1) 0%, transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+.project-aurora-glow:hover::after {
+  opacity: 1;
+}
+
+/* Ripe Ideas Border Pulsing */
+@keyframes border-pulse {
+  0%, 100% { border-color: var(--border); }
+  50% { border-color: rgba(200, 169, 110, 0.4); } /* Gold color pulse */
+}
+.border-pulse-ripe {
+  animation: border-pulse 2.2s infinite ease-in-out;
+}
+
+/* Seal Stamp Rotation and Glow */
+.seal-stamp-rotate {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease !important;
+}
+.seal-stamp-rotate:hover {
+  transform: rotate(-12deg) scale(1.06) !important;
+  filter: drop-shadow(0 0 8px rgba(196, 30, 58, 0.3)) !important;
+}
+
+/* Social Link Glow Ring */
+.social-link-glow {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.social-link-glow:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px var(--seal2);
+}
