@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getProjectBySlug, getProjects, urlSlug } from "@/lib/velite";
 import { MDXContent } from "@/components/mdx-content";
 import { InkDivider } from "@/components/wabi/InkDivider";
-import { ReadingProgress } from "@/components/wabi/ReadingProgress";
 import { TableOfContents } from "@/components/wabi/TableOfContents";
 import { ReactionBar } from "@/components/wabi/ReactionBar";
 export function generateStaticParams() {
@@ -31,8 +30,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <ReadingProgress />
-      
       <div 
         className="reader-grid" 
         style={{ 

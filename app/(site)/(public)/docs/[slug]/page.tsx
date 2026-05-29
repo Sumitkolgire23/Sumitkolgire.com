@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getDocBySlug, getDocs, urlSlug } from "@/lib/velite";
 import { MDXContent } from "@/components/mdx-content";
-import { ReadingProgress } from "@/components/wabi/ReadingProgress";
 import { TableOfContents } from "@/components/wabi/TableOfContents";
 
 export function generateStaticParams() {
@@ -23,8 +22,6 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
 
   return (
     <>
-      <ReadingProgress />
-
       <div
         className="reader-grid"
         style={{

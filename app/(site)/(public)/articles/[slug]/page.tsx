@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import React from "react";
 import { getArticleBySlug, getArticles, getRelatedArticles, urlSlug } from "@/lib/velite";
 import { MDXContent } from "@/components/mdx-content";
-import { OffsetShadowCard } from "@/components/wabi/OffsetShadowCard";
 import { InkDivider } from "@/components/wabi/InkDivider";
-import { ReadingProgress } from "@/components/wabi/ReadingProgress";
 import { TableOfContents } from "@/components/wabi/TableOfContents";
 import { ReactionBar } from "@/components/wabi/ReactionBar";
+import Link from "next/link";
+import { GlowCard } from "@/components/ui/GlowCard";
 
 // ── STATIC PARAMS ─────────────────────────────────────────
 export function generateStaticParams() {
@@ -61,7 +61,6 @@ export default async function ArticlePage({
   return (
     <>
       {/* ── ARTICLE HEADER ──────────────────────────── */}
-      <ReadingProgress />
       
       <div 
         className="reader-grid" 
@@ -274,32 +273,34 @@ export default async function ArticlePage({
               </h2>
               <div className="grid-responsive-3">
                 {related.map((rel) => (
-                  <OffsetShadowCard key={rel.slug} href={`/articles/${urlSlug(rel.slug)}`}>
-                    <p
-                      style={{
-                        fontFamily: "var(--mono)",
-                        fontSize: "0.65rem",
-                        color: "var(--seal)",
-                        marginBottom: "0.4rem",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {new Date(rel.date).getFullYear()}
-                    </p>
-                    <h3
-                      style={{
-                        fontFamily: "var(--serif)",
-                        fontSize: "0.95rem",
-                        fontWeight: 700,
-                        color: "var(--ink)",
-                        lineHeight: 1.3,
-                        margin: 0,
-                      }}
-                    >
-                      {rel.title}
-                    </h3>
-                  </OffsetShadowCard>
+                  <Link key={rel.slug} href={`/articles/${urlSlug(rel.slug)}`} style={{ textDecoration: "none" }}>
+                    <GlowCard style={{ padding: "1.5rem", border: "1px solid var(--border)", transition: "border-color 0.2s" }} className="article-card-lift">
+                      <p
+                        style={{
+                          fontFamily: "var(--mono)",
+                          fontSize: "0.65rem",
+                          color: "var(--seal)",
+                          marginBottom: "0.4rem",
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {new Date(rel.date).getFullYear()}
+                      </p>
+                      <h3
+                        style={{
+                          fontFamily: "var(--serif)",
+                          fontSize: "0.95rem",
+                          fontWeight: 700,
+                          color: "var(--ink)",
+                          lineHeight: 1.3,
+                          margin: 0,
+                        }}
+                      >
+                        {rel.title}
+                      </h3>
+                    </GlowCard>
+                  </Link>
                 ))}
               </div>
             </div>
