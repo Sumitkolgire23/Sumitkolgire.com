@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { TiltCard } from "@/components/ui/TiltCard";
+
 
 type Project = {
   slug: string;
@@ -41,6 +43,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
 
         {/* Projects grid: 2fr 1fr 1fr with tall card spanning 2 rows */}
         <div
+          className="proj-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "2fr 1fr 1fr",
@@ -51,57 +54,9 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
           }}
         >
           {/* Tall featured project */}
-          <Link
-            href={`/projects/${tall.slug}`}
-            className="reveal"
-            style={{
-              gridRow: "span 2",
-              background: "var(--bg2)",
-              border: "1px solid var(--border)",
-              padding: "24px",
-              textDecoration: "none",
-              color: "inherit",
-              display: "flex",
-              flexDirection: "column",
-              transition: "all .3s",
-              position: "relative",
-              overflow: "hidden",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--border3)";
-              (e.currentTarget as HTMLElement).style.background = "var(--bg3)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-              (e.currentTarget as HTMLElement).style.background = "var(--bg2)";
-            }}
-          >
-            {/* Bottom bar accent on hover */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "2px", background: "var(--seal)", transform: "scaleX(0)", transformOrigin: "left", transition: "transform .35s" }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.transform = "scaleX(1)")} />
-
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--moss)", letterSpacing: ".07em", marginBottom: "16px" }}>
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--moss)", animation: "pulse 2.5s ease-in-out infinite", flexShrink: 0, display: "inline-block" }} />
-              {STATUS_LABELS[tall.projectStatus ?? "active"] ?? "Active"}
-            </div>
-            <div style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text4)", marginBottom: "10px", letterSpacing: ".15em" }}>
-              [SK-001]
-            </div>
-            <h3 style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", fontStyle: "italic", color: "var(--text)", marginBottom: "8px", lineHeight: 1.28, fontWeight: 400 }}>{tall.title}</h3>
-            <p style={{ fontSize: "13px", color: "var(--text2)", lineHeight: 1.7, flex: 1, marginBottom: "16px" }}>{tall.excerpt}</p>
-            <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
-              {tall.stack.slice(0, 4).map(t => (
-                <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", padding: "2px 7px", border: "1px solid var(--border)", letterSpacing: ".04em" }}>{t}</span>
-              ))}
-            </div>
-          </Link>
-
-          {/* Remaining projects */}
-          {rest.slice(0, 4).map((proj, i) => (
+          <TiltCard className="reveal proj-tall" style={{ gridRow: "span 2" }}>
             <Link
-              key={proj.slug}
-              href={`/projects/${proj.slug}`}
-              className={`reveal rd${(i % 2) + 1}`}
+              href={`/projects/${tall.slug}`}
               style={{
                 background: "var(--bg2)",
                 border: "1px solid var(--border)",
@@ -110,6 +65,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
                 color: "inherit",
                 display: "flex",
                 flexDirection: "column",
+                height: "100%",
                 transition: "all .3s",
                 position: "relative",
                 overflow: "hidden",
@@ -123,21 +79,70 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
                 (e.currentTarget as HTMLElement).style.background = "var(--bg2)";
               }}
             >
+              {/* Bottom bar accent on hover */}
+              <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "2px", background: "var(--seal)", transform: "scaleX(0)", transformOrigin: "left", transition: "transform .35s" }}
+                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.transform = "scaleX(1)")} />
+
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--moss)", letterSpacing: ".07em", marginBottom: "16px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--moss)", animation: "pulse 2.5s ease-in-out infinite", flexShrink: 0, display: "inline-block" }} />
-                {STATUS_LABELS[proj.projectStatus ?? "active"] ?? "Active"}
+                {STATUS_LABELS[tall.projectStatus ?? "active"] ?? "Active"}
               </div>
               <div style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text4)", marginBottom: "10px", letterSpacing: ".15em" }}>
-                [SK-00{i + 2}]
+                [SK-001]
               </div>
-              <h3 style={{ fontFamily: "var(--serif)", fontSize: "1.15rem", fontStyle: "italic", color: "var(--text)", marginBottom: "8px", lineHeight: 1.28, fontWeight: 400 }}>{proj.title}</h3>
-              <p style={{ fontSize: "12.5px", color: "var(--text3)", lineHeight: 1.7, flex: 1, marginBottom: "16px" }}>{proj.excerpt}</p>
+              <h3 style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", fontStyle: "italic", color: "var(--text)", marginBottom: "8px", lineHeight: 1.28, fontWeight: 400 }}>{tall.title}</h3>
+              <p style={{ fontSize: "13px", color: "var(--text2)", lineHeight: 1.7, flex: 1, marginBottom: "16px" }}>{tall.excerpt}</p>
               <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
-                {proj.stack.slice(0, 2).map(t => (
+                {tall.stack.slice(0, 4).map(t => (
                   <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", padding: "2px 7px", border: "1px solid var(--border)", letterSpacing: ".04em" }}>{t}</span>
                 ))}
               </div>
             </Link>
+          </TiltCard>
+
+          {/* Remaining projects */}
+          {rest.slice(0, 4).map((proj, i) => (
+            <TiltCard key={proj.slug} className={`reveal rd${(i % 2) + 1}`}>
+              <Link
+                href={`/projects/${proj.slug}`}
+                style={{
+                  background: "var(--bg2)",
+                  border: "1px solid var(--border)",
+                  padding: "24px",
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  transition: "all .3s",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border3)";
+                  (e.currentTarget as HTMLElement).style.background = "var(--bg3)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
+                  (e.currentTarget as HTMLElement).style.background = "var(--bg2)";
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--moss)", letterSpacing: ".07em", marginBottom: "16px" }}>
+                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--moss)", animation: "pulse 2.5s ease-in-out infinite", flexShrink: 0, display: "inline-block" }} />
+                  {STATUS_LABELS[proj.projectStatus ?? "active"] ?? "Active"}
+                </div>
+                <div style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text4)", marginBottom: "10px", letterSpacing: ".15em" }}>
+                  [SK-00{i + 2}]
+                </div>
+                <h3 style={{ fontFamily: "var(--serif)", fontSize: "1.15rem", fontStyle: "italic", color: "var(--text)", marginBottom: "8px", lineHeight: 1.28, fontWeight: 400 }}>{proj.title}</h3>
+                <p style={{ fontSize: "12.5px", color: "var(--text3)", lineHeight: 1.7, flex: 1, marginBottom: "16px" }}>{proj.excerpt}</p>
+                <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", paddingTop: "12px", borderTop: "1px solid var(--border)" }}>
+                  {proj.stack.slice(0, 2).map(t => (
+                    <span key={t} style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", padding: "2px 7px", border: "1px solid var(--border)", letterSpacing: ".04em" }}>{t}</span>
+                  ))}
+                </div>
+              </Link>
+            </TiltCard>
           ))}
         </div>
       </div>
