@@ -146,14 +146,22 @@ export function DarkPageEffects() {
     };
     attachListeners();
 
-    // Reading progress bar scroll listener
-    const onScroll = () => {
-      const t = document.body.scrollHeight - window.innerHeight;
-      if (t > 0) {
-        bar.style.width = Math.min((window.scrollY / t) * 100, 100) + "%";
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // Reading progress bar scroll listener (Safari & Firefox Fallback)
+    let onScroll: (() => void) | null = null;
+    const supportsCSSScroll = typeof CSS !== "undefined" && CSS.supports && (CSS.supports("animation-timeline: scroll()") || CSS.supports("animation-timeline", "scroll()"));
+
+    if (supportsCSSScroll) {
+      bar.classList.add("css-scroll");
+    } else {
+      onScroll = () => {
+        const t = document.documentElement.scrollHeight - window.innerHeight;
+        if (t > 0) {
+          bar.style.transform = `scaleX(${Math.min(window.scrollY / t, 1)})`;
+        }
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    }
 
     // Scroll-reveal triggers
     const triggers: any[] = [];
@@ -208,12 +216,56 @@ export function DarkPageEffects() {
         reveal.scrollTrigger(title as HTMLElement);
         revealsCleanups.push(() => reveal.revert());
       });
+
+      // Background Aurora Parallax Animation
+      const scrollAnim1 = gsap.to(".aurora-1", {
+        y: -140,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      });
+      const scrollAnim2 = gsap.to(".aurora-2", {
+        y: 90,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.2,
+        },
+      });
+      const scrollAnim3 = gsap.to(".aurora-3", {
+        y: -60,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.8,
+        },
+      });
+
+      if (scrollAnim1.scrollTrigger) triggers.push(scrollAnim1.scrollTrigger);
+      if (scrollAnim2.scrollTrigger) triggers.push(scrollAnim2.scrollTrigger);
+      if (scrollAnim3.scrollTrigger) triggers.push(scrollAnim3.scrollTrigger);
+
+      revealsCleanups.push(() => {
+        scrollAnim1.kill();
+        scrollAnim2.kill();
+        scrollAnim3.kill();
+      });
     }
 
     return () => {
       cancelAnimationFrame(animId);
       document.removeEventListener("mousemove", onMove);
-      window.removeEventListener("scroll", onScroll);
+      if (onScroll) {
+        window.removeEventListener("scroll", onScroll);
+      }
       window.removeEventListener("resize", resize);
       triggers.forEach((trigger) => trigger.kill());
       revealsCleanups.forEach((cleanup) => cleanup());
