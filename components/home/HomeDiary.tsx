@@ -41,7 +41,7 @@ export function HomeDiary({
           <div style={{ display: "flex", alignItems: "baseline", gap: "14px" }}>
             <span style={{ fontFamily: "var(--serif)", fontSize: "2.8rem", fontStyle: "italic", color: "rgba(255,255,255,.04)", lineHeight: 1 }}>02</span>
             <div>
-              <span style={{ fontSize: "1.05rem", fontWeight: 500, color: "var(--text)" }}>From the Lab Diary</span>
+              <span className="section-title" style={{ fontSize: "1.05rem", fontWeight: 500, color: "var(--text)" }}>From the Lab Diary</span>
               <span style={{ display: "block", fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", marginTop: "3px", letterSpacing: ".1em", textTransform: "uppercase" }}>Private entries · Made public</span>
             </div>
           </div>

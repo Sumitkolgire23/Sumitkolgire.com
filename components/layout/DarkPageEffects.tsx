@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getFeatureFlags } from "@/lib/features";
+import { createTextReveal } from "@/lib/animations/text-reveal";
 
 /** Dark custom cursor, reading-progress bar, and canvas ink trail — mounted once globally. */
 export function DarkPageEffects() {
@@ -156,6 +157,7 @@ export function DarkPageEffects() {
 
     // Scroll-reveal triggers
     const triggers: any[] = [];
+    const revealsCleanups: (() => void)[] = [];
 
     if (!flags.scrollAnimations) {
       // Fallback: immediately show all content
@@ -194,6 +196,18 @@ export function DarkPageEffects() {
           triggers.push(anim.scrollTrigger);
         }
       });
+
+      // Section titles word-reveals on scroll trigger
+      const sectionTitles = document.querySelectorAll(".section-title");
+      sectionTitles.forEach((title) => {
+        const reveal = createTextReveal(title as HTMLElement, {
+          type: "words",
+          stagger: 0.05,
+          duration: 0.7,
+        });
+        reveal.scrollTrigger(title as HTMLElement);
+        revealsCleanups.push(() => reveal.revert());
+      });
     }
 
     return () => {
@@ -202,6 +216,7 @@ export function DarkPageEffects() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", resize);
       triggers.forEach((trigger) => trigger.kill());
+      revealsCleanups.forEach((cleanup) => cleanup());
     };
   }, []);
 
