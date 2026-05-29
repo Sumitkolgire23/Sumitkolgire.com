@@ -158,7 +158,7 @@ export function HomeHero() {
         minHeight: "90vh",
         display: "grid",
         gridTemplateColumns: "1fr 440px",
-        padding: "100px 40px 60px",
+        padding: "40px 40px 60px",
         gap: "48px",
         alignItems: "center",
         position: "relative",
@@ -389,10 +389,10 @@ export function HomeHero() {
       {/* Responsive override */}
       <style>{`
         @media (max-width: 1100px) {
-          #hero { grid-template-columns: 1fr !important; padding: 88px 28px 48px !important; gap: 40px !important; min-height: auto !important; }
+          #hero { grid-template-columns: 1fr !important; padding: 40px 28px 48px !important; gap: 40px !important; min-height: auto !important; }
         }
         @media (max-width: 680px) {
-          #hero { padding: 72px 20px 36px !important; }
+          #hero { padding: 28px 20px 36px !important; }
         }
       `}</style>
     </section>
