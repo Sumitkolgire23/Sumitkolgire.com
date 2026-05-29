@@ -51,7 +51,7 @@ export function SiteFooter() {
 
       {/* Centre seal */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="seal-stamp-rotate" style={{ cursor: "pointer" }}>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="seal-stamp-rotate" aria-hidden="true">
           <circle cx="20" cy="20" r="19" stroke="rgba(196,30,58,.3)" strokeWidth="1"/>
           <circle cx="20" cy="20" r="15" stroke="rgba(196,30,58,.15)" strokeWidth=".5"/>
           <text fontFamily="'Instrument Serif',serif" fontSize="8" fill="rgba(196,30,58,.5)" textAnchor="middle" x="20" y="17" fontStyle="italic">SK</text>

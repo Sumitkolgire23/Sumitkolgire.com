@@ -354,7 +354,7 @@ export function HomeHero() {
           />
           {/* Hanko stamp */}
           <div style={{ position: "absolute", top: "24px", right: "24px" }}>
-            <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none" aria-hidden="true">
               <circle cx="21" cy="21" r="20" stroke="#c41e3a" strokeWidth="1.2"/>
               <circle cx="21" cy="21" r="16" stroke="#c41e3a" strokeWidth=".5"/>
               <text fontFamily="'Instrument Serif',serif" fontSize="9" fill="#c41e3a" textAnchor="middle" x="21" y="17" fontStyle="italic">POV</text>
