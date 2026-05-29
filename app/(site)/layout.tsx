@@ -5,6 +5,7 @@ import { SiteNavbar } from "@/components/layout/SiteNavbar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { DarkPageEffects } from "@/components/layout/DarkPageEffects";
 import { SmoothScrollProvider } from "@/components/layout/SmoothScrollProvider";
+import { AuroraBackground } from "@/components/effects/AuroraBackground";
 
 // ── FONTS ─────────────────────────────────────────────────
 // Self-hosted via next/font — zero FOUT, zero CLS
@@ -81,11 +82,12 @@ export default function RootLayout({
       lang="en"
       className={`${instrumentSerif.variable} ${geistMono.variable} ${geist.variable}`}
     >
-      <body className="antialiased">
+      <body className="antialiased" style={{ position: "relative" }}>
         {/* Skip link — WCAG 2.4.1: bypass navigation for keyboard/screen reader users */}
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
+        <AuroraBackground />
         <SmoothScrollProvider>
           <DarkPageEffects />
           <SiteNavbar />
