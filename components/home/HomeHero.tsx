@@ -31,7 +31,7 @@ export function HomeHero() {
     const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!getFeatureFlags().scrollAnimations || reducedMotion) {
       el.style.opacity = "1";
-      gsap.set(section.querySelectorAll(".reveal"), { opacity: 1, y: 0 });
+      gsap.set([overline, typewriter, paragraph, ctas, rightCol], { opacity: 1, y: 0 });
       return;
     }
 
@@ -205,7 +205,7 @@ export function HomeHero() {
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Overline */}
         <div
-          className="reveal reveal-overline"
+          className="reveal-overline"
           style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}
         >
           <div style={{ width: "24px", height: "1px", background: "var(--seal)" }} />
@@ -244,7 +244,7 @@ export function HomeHero() {
 
         {/* Dynamic Typewriter Identity */}
         <div
-          className="reveal reveal-typewriter"
+          className="reveal-typewriter"
           style={{
             fontFamily: "var(--mono)",
             fontSize: "13px",
@@ -260,7 +260,7 @@ export function HomeHero() {
         </div>
 
         <p
-          className="reveal reveal-paragraph"
+          className="reveal-paragraph"
           style={{
             fontSize: "15px",
             color: "var(--text2)",
@@ -276,7 +276,7 @@ export function HomeHero() {
         </p>
 
         <div
-          className="reveal reveal-ctas"
+          className="reveal-ctas"
           style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}
         >
           <MagneticButton strength={0.25}>
@@ -321,7 +321,7 @@ export function HomeHero() {
 
       {/* ── RIGHT — 3D Scene and Featured Card Stack ──────────────────────── */}
       <div
-        className="reveal reveal-right"
+        className="reveal-right"
         style={{
           position: "relative",
           zIndex: 2,
