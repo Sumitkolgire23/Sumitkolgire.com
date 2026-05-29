@@ -2,9 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getFeatureFlags } from "@/lib/features";
 
-export function HomeStatsBar({ streak }: { streak: number }) {
+export function HomeStatsBar({ streak, projectCount = 7 }: { streak: number; projectCount?: number }) {
   const countRef = useRef<HTMLDivElement>(null);
   const streakRef = useRef<HTMLSpanElement>(null);
 
@@ -12,9 +13,12 @@ export function HomeStatsBar({ streak }: { streak: number }) {
     const el = countRef.current;
     if (!el) return;
 
+    // Register ScrollTrigger safely
+    gsap.registerPlugin(ScrollTrigger);
+
     // Check feature flags
     if (!getFeatureFlags().scrollAnimations) {
-      el.textContent = "7";
+      el.textContent = String(projectCount);
       if (streakRef.current) streakRef.current.textContent = String(streak);
       return;
     }
@@ -24,7 +28,7 @@ export function HomeStatsBar({ streak }: { streak: number }) {
 
     const obj = { val: 0 };
     const anim = gsap.to(obj, {
-      val: 7,
+      val: projectCount,
       duration: 1.5,
       ease: "power2.out",
       onUpdate: () => {
@@ -64,7 +68,7 @@ export function HomeStatsBar({ streak }: { streak: number }) {
         if (streakAnim.scrollTrigger) streakAnim.scrollTrigger.kill();
       }
     };
-  }, [streak]);
+  }, [streak, projectCount]);
 
   return (
     <>
@@ -91,7 +95,7 @@ export function HomeStatsBar({ streak }: { streak: number }) {
             ref={countRef}
             style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
           >
-            7
+            {projectCount}
           </div>
           <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>Active projects</div>
           <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Always building</div>

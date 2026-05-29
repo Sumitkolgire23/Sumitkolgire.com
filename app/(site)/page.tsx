@@ -28,9 +28,10 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   // ── Velite (static, build-time) ───────────────────────
   const allArticles  = getArticles().slice(0, 5);
-  const allProjects  = getProjects()
-    .filter(p => p.projectStatus === "active" || p.projectStatus === "experimental")
-    .slice(0, 5);
+  const activeProjects = getProjects().filter(
+    p => p.projectStatus === "active" || p.projectStatus === "experimental"
+  );
+  const projectsToShow = activeProjects.slice(0, 5);
 
   // ── Supabase (dynamic, request-time) ─────────────────
   const [diaryEntries, streak, ideas, ideasStats] = await Promise.all([
@@ -47,7 +48,7 @@ export default async function HomePage() {
   return (
     <>
       <HomeHero />
-      <HomeStatsBar streak={streak} />
+      <HomeStatsBar streak={streak} projectCount={activeProjects.length} />
       <HomeTicker />
       <HomeWriting articles={allArticles} />
       <HomeDiary
@@ -55,7 +56,7 @@ export default async function HomePage() {
         streak={streak}
         heatmapLevels={heatmapLevels}
       />
-      <HomeProjects projects={allProjects} />
+      <HomeProjects projects={projectsToShow} />
       <HomeIdeas ideas={ideas} stats={ideasStats} />
       <HomeObsession />
       <HomeNewsletter />
