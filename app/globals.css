@@ -678,3 +678,190 @@ html.lenis, html.lenis body {
   50%  { background-position: 100% center; }
   100% { background-position: 0% center; }
 }
+
+/* ── SPRINT 3 DYNAMIC COMPONENT STYLES ──────────────────── */
+
+/* Glow Card */
+.glow-card {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    300px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(196, 30, 58, 0.06),
+    transparent 65%
+  );
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  z-index: 1;
+}
+.glow-card:hover::before {
+  opacity: 1;
+}
+
+/* Aurora Gradient Blobs */
+.aurora-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  filter: blur(80px);
+}
+.aurora {
+  position: absolute;
+  border-radius: 50%;
+  animation: aurora-drift 12s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.aurora-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--seal) 0%, transparent 70%);
+  top: -200px;
+  right: -100px;
+}
+.aurora-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--sky) 0%, transparent 70%);
+  bottom: -150px;
+  left: -100px;
+  animation-delay: -4s;
+  animation-duration: 15s;
+}
+.aurora-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+  top: 30%;
+  left: 40%;
+  animation-delay: -8s;
+  animation-duration: 18s;
+}
+@keyframes aurora-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(30px, -20px) scale(1.08); }
+  66%  { transform: translate(-20px, 15px) scale(0.95); }
+  100% { transform: translate(10px, -10px) scale(1.04); }
+}
+
+/* Full Screen Mobile Drawer */
+.mobile-drawer {
+  position: fixed;
+  inset: 54px 0 0 0;
+  background: rgba(13, 13, 14, 0.98);
+  backdrop-filter: blur(16px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.2rem;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  padding-bottom: 54px;
+}
+.mobile-drawer.open {
+  clip-path: inset(0 0 0 0);
+}
+.mobile-drawer a {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 2.2rem;
+  color: var(--text2);
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease, color 0.2s;
+}
+.mobile-drawer.open a {
+  opacity: 1;
+  transform: translateY(0);
+}
+.mobile-drawer a:hover {
+  color: var(--seal);
+}
+.mobile-drawer.open a:nth-child(1) { transition-delay: 0.08s; }
+.mobile-drawer.open a:nth-child(2) { transition-delay: 0.14s; }
+.mobile-drawer.open a:nth-child(3) { transition-delay: 0.20s; }
+.mobile-drawer.open a:nth-child(4) { transition-delay: 0.26s; }
+.mobile-drawer.open a:nth-child(5) { transition-delay: 0.32s; }
+.mobile-drawer.open a:nth-child(6) { transition-delay: 0.38s; }
+
+/* Underline Draw links */
+.underline-draw {
+  position: relative;
+}
+.underline-draw::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--seal);
+  transform: scaleX(0);
+  transform-origin: bottom left;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.underline-draw:hover::after {
+  transform: scaleX(1);
+}
+
+/* Pulsing Dot Grid */
+.dot-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(196, 30, 58, 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  animation: dot-pulse 4s ease-in-out infinite;
+}
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.7; }
+}
+
+/* Floating Garden Cards */
+.idea-card {
+  transform: rotate(var(--rotation, 0deg));
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s;
+  animation: gentle-float var(--float-duration, 6s) ease-in-out infinite;
+}
+.idea-card:nth-child(odd)  { --rotation: -0.8deg; --float-duration: 5.5s; }
+.idea-card:nth-child(even) { --rotation: 0.6deg;  --float-duration: 6.5s; }
+.idea-card:nth-child(3n)   { --rotation: -0.4deg; --float-duration: 7s; }
+.idea-card:hover {
+  transform: rotate(0deg) translateY(-5px) !important;
+  border-color: var(--border3) !important;
+  box-shadow: 0 12px 30px rgba(196, 30, 58, 0.04);
+}
+@keyframes gentle-float {
+  0%, 100% { transform: rotate(var(--rotation)) translateY(0); }
+  50%      { transform: rotate(var(--rotation)) translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .idea-card {
+    animation: none !important;
+    transform: none !important;
+  }
+  .idea-card:hover {
+    transform: translateY(-2px) !important;
+  }
+}
+
