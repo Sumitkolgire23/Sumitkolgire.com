@@ -51,7 +51,7 @@ export function HomeDiary({
         </div>
 
         {/* Two-column: diary list + heatmap/streak */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "60px", alignItems: "start" }}>
+        <div className="diary-inner" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "60px", alignItems: "start" }}>
           {/* Left: intro + diary rows */}
           <div>
             <p className="reveal" style={{ fontSize: "15px", color: "var(--text2)", lineHeight: 1.88, marginBottom: "28px", fontStyle: "italic" }}>
@@ -71,9 +71,11 @@ export function HomeDiary({
                   // Show first ~140 chars of content as preview
                   const preview = entry.content.length > 140 ? entry.content.slice(0, 140) + "…" : entry.content;
                   return (
-                    <div
+                    <Link
                       key={entry.id}
+                      href={`/lab#entry-${entry.id}`}
                       className="diary-row"
+                      aria-label={`Diary entry from ${day} ${mon}: ${preview}`}
                       style={{
                         display: "grid",
                         gridTemplateColumns: "52px 1fr",
@@ -83,6 +85,8 @@ export function HomeDiary({
                         cursor: "pointer",
                         transition: "background .2s",
                         alignItems: "start",
+                        textDecoration: "none",
+                        color: "inherit",
                       }}
                       onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "var(--bg3)")}
                       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
@@ -103,7 +107,7 @@ export function HomeDiary({
                           {preview}
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

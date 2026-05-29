@@ -69,11 +69,11 @@ export function HomeWriting({ articles }: { articles: Article[] }) {
 
         {/* Writing grid — 3-col border grid like the design */}
         <div
-          className="reveal"
+          className="reveal writing-inner"
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1px", background: "var(--border)", border: "1px solid var(--border)" }}
         >
           {/* Wide featured article */}
-          <GlowCard className="article-card-lift" style={{ gridColumn: "span 2" }}>
+          <GlowCard className="article-card-lift wide-entry" style={{ gridColumn: "span 2" }}>
             <Link
               href={`/articles/${wide.slug}`}
               style={{ display: "block", padding: "28px", cursor: "pointer", textDecoration: "none", color: "inherit", position: "relative", zIndex: 2 }}
