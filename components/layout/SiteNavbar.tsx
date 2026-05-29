@@ -139,7 +139,7 @@ export function SiteNavbar() {
       </header>
 
       {/* Spacer so content doesn't hide under fixed nav */}
-      <div style={{ height: "54px" }} aria-hidden="true" />
+      <div style={{ height: scrolled ? "48px" : "54px", transition: "height 0.3s" }} aria-hidden="true" />
 
       {/* Mobile drawer */}
       <div
