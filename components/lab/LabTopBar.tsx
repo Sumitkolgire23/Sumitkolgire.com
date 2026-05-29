@@ -12,13 +12,36 @@ const TABS = [
   { href: "/lab/published", label: "Published",    dot: "var(--moss)"  },
 ];
 
+import { Menu, Settings } from "lucide-react";
+import { useLabShell } from "@/components/lab/LabShellClient";
+
 interface LabTopBarProps { userInitial?: string; streak?: number; }
 
 export function LabTopBar({ userInitial = "SK", streak = 0 }: LabTopBarProps) {
   const pathname = usePathname();
+  const { navOpen, setNavOpen, panelOpen, setPanelOpen, hasPanel } = useLabShell();
 
   return (
     <header className="lab-topbar">
+      {/* Mobile Menu Toggle */}
+      <button
+        className="lab-menu-toggle"
+        onClick={() => setNavOpen(!navOpen)}
+        aria-label="Toggle menu"
+        style={{
+          background: "transparent",
+          border: "none",
+          color: "var(--text3)",
+          cursor: "pointer",
+          marginRight: "10px",
+          display: "none", // overridden in lab.css media query
+          alignItems: "center",
+          padding: 0,
+        }}
+      >
+        <Menu size={20} />
+      </button>
+
       {/* Logo */}
       <div className="topbar-logo">
         <svg className="logo-seal" viewBox="0 0 26 26" fill="none" aria-hidden="true">
@@ -55,6 +78,25 @@ export function LabTopBar({ userInitial = "SK", streak = 0 }: LabTopBarProps) {
 
         {/* Avatar + logout */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {hasPanel && (
+            <button
+              className="lab-settings-toggle"
+              onClick={() => setPanelOpen(!panelOpen)}
+              aria-label="Toggle editor settings"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: panelOpen ? "var(--seal)" : "var(--text3)",
+                cursor: "pointer",
+                marginRight: "4px",
+                display: "none", // overridden in lab.css media query
+                alignItems: "center",
+                padding: 0,
+              }}
+            >
+              <Settings size={18} />
+            </button>
+          )}
           <div className="lab-avatar" aria-label="Logged in user">{userInitial}</div>
           <form action={signOutAction}>
             <button

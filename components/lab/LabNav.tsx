@@ -29,11 +29,14 @@ interface LabNavProps { userEmail?: string; streak?: number; heatmapLevels?: num
 
 const DEFAULT_HEATMAP = Array<number>(20).fill(0);
 
+import { useLabShell } from "@/components/lab/LabShellClient";
+
 export function LabNav({ userEmail, streak = 0, heatmapLevels = DEFAULT_HEATMAP }: LabNavProps) {
   const pathname = usePathname();
+  const { navOpen } = useLabShell();
 
   return (
-    <nav className="lab-leftnav" aria-label="Lab navigation">
+    <nav className={`lab-leftnav ${navOpen ? "open" : ""}`} aria-label="Lab navigation">
       {/* Streak card */}
       <div className="nav-streak-card">
         <div className="nsc-label">Writing streak</div>

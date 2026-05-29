@@ -27,6 +27,9 @@ function fmt(iso?: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
+import { useLabShell } from "@/components/lab/LabShellClient";
+import { useEffect } from "react";
+
 export default function MetadataPanel({
   entryId, section,
   initialVisibility = "private",
@@ -38,6 +41,7 @@ export default function MetadataPanel({
   wordGoal          = 500,
   createdAt, updatedAt,
 }: MetadataPanelProps) {
+  const { panelOpen, setHasPanel } = useLabShell();
   const [type, setType]             = useState(initialType);
   const [mood, setMood]             = useState(initialMood);
   const [visibility, setVisibility] = useState(initialVisibility);
@@ -46,6 +50,11 @@ export default function MetadataPanel({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const tagDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setHasPanel(true);
+    return () => setHasPanel(false);
+  }, [setHasPanel]);
 
   const update = (payload: Parameters<typeof updateLabEntryMeta>[1]) =>
     startTransition(() => { void updateLabEntryMeta(entryId, payload); });
@@ -84,7 +93,7 @@ export default function MetadataPanel({
   const displayWordCount = wordCount ?? initialWordCount;
 
   return (
-    <aside className="lab-rightpanel">
+    <aside className={`lab-rightpanel ${panelOpen ? "open" : ""}`}>
 
       {/* Entry type */}
       <div className="rp-section">

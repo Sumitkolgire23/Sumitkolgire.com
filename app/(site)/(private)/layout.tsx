@@ -6,6 +6,8 @@ import { LabTopBar } from "@/components/lab/LabTopBar";
 import { calculateStreak, computeHeatmap } from "./utils";
 import "@/app/lab.css";
 
+import { LabShellClient } from "@/components/lab/LabShellClient";
+
 export default async function PrivateLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
@@ -44,10 +46,10 @@ export default async function PrivateLayout({ children }: { children: React.Reac
       Since children is a fragment, both elements are direct children of
       lab-shell and fall into columns 2 and 3 naturally in CSS grid.
     */
-    <div className="lab-shell">
+    <LabShellClient>
       <LabTopBar userInitial={initials} streak={streak} />
       <LabNav userEmail={user?.email} streak={streak} heatmapLevels={heatmapLevels} />
       {children}
-    </div>
+    </LabShellClient>
   );
 }
