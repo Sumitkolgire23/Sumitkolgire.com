@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getFeatureFlags } from "@/lib/features";
 
 const IDENTITIES = [
   "AI/ML engineer.",
@@ -15,6 +16,12 @@ export function TypedIdentity() {
   const [isWaiting, setIsWaiting] = useState(false);
 
   useEffect(() => {
+    // Skip typing animations if typewriter flag is disabled
+    if (!getFeatureFlags().typewriter) {
+      setText(IDENTITIES[0]);
+      return;
+    }
+
     let timer: NodeJS.Timeout;
     const currentIdentity = IDENTITIES[identityIndex];
 

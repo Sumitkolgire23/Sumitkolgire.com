@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getFeatureFlags } from "@/lib/features";
 
 export function SmoothScrollProvider({
   children,
@@ -11,8 +12,15 @@ export function SmoothScrollProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    // 1. Register ScrollTrigger
+    const flags = getFeatureFlags();
+    
+    // Register ScrollTrigger globally
     gsap.registerPlugin(ScrollTrigger);
+
+    // Skip Lenis initialization if smoothScroll feature flag is disabled
+    if (!flags.smoothScroll) {
+      return;
+    }
 
     // 2. Initialize Lenis
     const lenis = new Lenis({
