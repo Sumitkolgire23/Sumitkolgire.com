@@ -580,3 +580,51 @@ pre code {
 @media (max-width: 640px) {
   .resource-row-container section { padding-left: 20px !important; padding-right: 20px !important; }
 }
+
+/* ── LENIS SMOOTH SCROLLING ───────────────────────────────── */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ── MONOSPACE TYPEWRITER CURSOR ────────────────────────── */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background-color: var(--seal);
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: typewriter-blink 1s steps(2) infinite;
+}
+@keyframes typewriter-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── ANIMATED SVG BRUSH DIVIDER ───────────────────────────── */
+.brush-stroke-divider {
+  width: 100%;
+  height: 8px;
+  margin: 2.5rem 0;
+  opacity: 0.45;
+}
+.brush-path {
+  stroke-dasharray: 820;
+  stroke-dashoffset: 820;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.brush-stroke-divider.drawn .brush-path {
+  stroke-dashoffset: 0;
+}
