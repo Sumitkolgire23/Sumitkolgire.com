@@ -44,14 +44,18 @@ export function HomeStatsBar({ streak }: { streak: number }) {
   return (
     <>
       <div
+        id="stats-bar-wrapper"
         style={{
           display: "flex",
           borderTop: "1px solid var(--border)",
           borderBottom: "1px solid var(--border)",
           margin: "0 40px",
+          position: "relative",
+          overflow: "hidden",
         }}
         className="reveal"
       >
+        <div className="dot-grid-bg" />
         {/* Active projects */}
         <div
           style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
