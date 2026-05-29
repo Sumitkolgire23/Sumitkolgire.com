@@ -182,11 +182,20 @@ body::after {
   position: fixed;
   top: 0;
   left: 0;
-  height: 1px;
-  width: 0;
+  height: 2px;
+  width: 100%;
   background: var(--seal);
-  z-index: 9997;
-  transition: width 0.08s linear;
+  z-index: 10200; /* above nav layout and overlays */
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.reading-bar.css-scroll {
+  transition: none !important;
+  animation: scroll-progress linear;
+  animation-timeline: scroll();
+}
+@keyframes scroll-progress {
+  to { transform: scaleX(1); }
 }
 
 /* ── SELECTION ─────────────────────────────────────────── */
