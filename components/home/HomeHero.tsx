@@ -219,6 +219,7 @@ export function HomeHero() {
           <MagneticButton strength={0.25}>
             <Link
               href="/articles"
+              className="cta-glow-scale"
               style={{
                 fontFamily: "var(--mono)",
                 fontSize: "11px",
@@ -227,16 +228,7 @@ export function HomeHero() {
                 padding: "11px 26px",
                 textDecoration: "none",
                 letterSpacing: ".08em",
-                transition: "all .25s",
                 display: "inline-block",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = "#a01830";
-                (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = "var(--seal)";
-                (e.currentTarget as HTMLElement).style.transform = "";
               }}
             >
               Read the writing
@@ -245,6 +237,7 @@ export function HomeHero() {
           <MagneticButton strength={0.25}>
             <Link
               href="/projects"
+              className="cta-glow-scale"
               style={{
                 fontFamily: "var(--mono)",
                 fontSize: "11px",
@@ -253,17 +246,8 @@ export function HomeHero() {
                 border: "1px solid var(--border3)",
                 textDecoration: "none",
                 letterSpacing: ".08em",
-                transition: "all .25s",
                 display: "inline-block",
                 background: "transparent",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = "var(--text3)";
-                (e.currentTarget as HTMLElement).style.color = "var(--text)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = "var(--border3)";
-                (e.currentTarget as HTMLElement).style.color = "var(--text3)";
               }}
             >
               View projects
