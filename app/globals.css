@@ -659,3 +659,22 @@ html.lenis, html.lenis body {
     transition: none !important;
   }
 }
+
+/* Animated gradient text for key emphasis headings */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--seal) 0%,
+    var(--gold) 50%,
+    var(--seal) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 4.5s ease infinite;
+}
+@keyframes gradient-shift {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
