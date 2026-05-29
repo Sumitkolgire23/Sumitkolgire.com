@@ -6,6 +6,7 @@ import { getFeatureFlags } from "@/lib/features";
 
 export function HomeStatsBar({ streak }: { streak: number }) {
   const countRef = useRef<HTMLDivElement>(null);
+  const streakRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const el = countRef.current;
@@ -14,6 +15,7 @@ export function HomeStatsBar({ streak }: { streak: number }) {
     // Check feature flags
     if (!getFeatureFlags().scrollAnimations) {
       el.textContent = "7";
+      if (streakRef.current) streakRef.current.textContent = String(streak);
       return;
     }
 
@@ -35,11 +37,34 @@ export function HomeStatsBar({ streak }: { streak: number }) {
       },
     });
 
+    let streakAnim: any;
+    if (streakRef.current && streak > 0) {
+      streakRef.current.textContent = "0";
+      const streakObj = { val: 0 };
+      streakAnim = gsap.to(streakObj, {
+        val: streak,
+        duration: 1.5,
+        ease: "power2.out",
+        onUpdate: () => {
+          if (streakRef.current) streakRef.current.textContent = String(Math.floor(streakObj.val));
+        },
+        scrollTrigger: {
+          trigger: streakRef.current,
+          start: "top 95%",
+          toggleActions: "play none none none",
+        },
+      });
+    }
+
     return () => {
       anim.kill();
       if (anim.scrollTrigger) anim.scrollTrigger.kill();
+      if (streakAnim) {
+        streakAnim.kill();
+        if (streakAnim.scrollTrigger) streakAnim.scrollTrigger.kill();
+      }
     };
-  }, []);
+  }, [streak]);
 
   return (
     <>
@@ -109,7 +134,13 @@ export function HomeStatsBar({ streak }: { streak: number }) {
           </div>
           <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>Lab diary</div>
           <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>
-            {streak > 0 ? `${streak} day streak` : "Keep writing"}
+            {streak > 0 ? (
+              <span>
+                <span ref={streakRef}>0</span> day streak
+              </span>
+            ) : (
+              "Keep writing"
+            )}
           </div>
         </div>
       </div>
