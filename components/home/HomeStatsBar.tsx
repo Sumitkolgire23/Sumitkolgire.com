@@ -1,31 +1,44 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { getFeatureFlags } from "@/lib/features";
 
 export function HomeStatsBar({ streak }: { streak: number }) {
   const countRef = useRef<HTMLDivElement>(null);
-  const animated = useRef(false);
 
   useEffect(() => {
     const el = countRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !animated.current) {
-          animated.current = true;
-          let i = 0;
-          const target = 7;
-          const interval = setInterval(() => {
-            el.textContent = String(++i);
-            if (i >= target) clearInterval(interval);
-          }, 100);
-          observer.disconnect();
-        }
+
+    // Check feature flags
+    if (!getFeatureFlags().scrollAnimations) {
+      el.textContent = "7";
+      return;
+    }
+
+    // Set initial text
+    el.textContent = "0";
+
+    const obj = { val: 0 };
+    const anim = gsap.to(obj, {
+      val: 7,
+      duration: 1.5,
+      ease: "power2.out",
+      onUpdate: () => {
+        el.textContent = String(Math.floor(obj.val));
       },
-      { threshold: 0.8 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+      scrollTrigger: {
+        trigger: el,
+        start: "top 95%",
+        toggleActions: "play none none none",
+      },
+    });
+
+    return () => {
+      anim.kill();
+      if (anim.scrollTrigger) anim.scrollTrigger.kill();
+    };
   }, []);
 
   return (

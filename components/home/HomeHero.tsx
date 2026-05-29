@@ -1,10 +1,91 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { TimeAwareGreeting } from "@/components/home/TimeAwareGreeting";
 import { TypedIdentity } from "@/components/home/TypedIdentity";
+import SplitType from "split-type";
+import { gsap } from "gsap";
+import { getFeatureFlags } from "@/lib/features";
 
 export function HomeHero() {
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+
+    // Check feature flags
+    if (!getFeatureFlags().scrollAnimations) {
+      el.style.opacity = "1";
+      return;
+    }
+
+    // Split headline by characters & words
+    const split = new SplitType(el, { types: "chars,words" });
+    const chars = split.chars;
+    if (!chars) return;
+
+    // Accessibility: set label on parent and hide individual characters
+    el.setAttribute("aria-label", el.textContent || "");
+    chars.forEach((char) => char.setAttribute("aria-hidden", "true"));
+
+    // Set overflow hidden on words to clip sliding chars
+    const words = el.querySelectorAll(".word");
+    words.forEach((word) => {
+      (word as HTMLElement).style.display = "inline-block";
+      (word as HTMLElement).style.overflow = "hidden";
+      (word as HTMLElement).style.verticalAlign = "bottom";
+    });
+
+    // Disable CSS transitions inline for text nodes to prevent lags
+    gsap.set(chars, { transition: "none" });
+
+    // Set initial displaced state
+    gsap.set(chars, { y: "110%", opacity: 0 });
+
+    // Separate normal characters from the emphasis word characters
+    const intelligentWord = el.querySelector("em");
+    const normalChars: HTMLElement[] = [];
+    const intelligentChars: HTMLElement[] = [];
+
+    chars.forEach((char) => {
+      if (intelligentWord?.contains(char)) {
+        intelligentChars.push(char);
+      } else {
+        normalChars.push(char);
+      }
+    });
+
+    const tl = gsap.timeline({ delay: 0.2 });
+
+    tl.to(normalChars, {
+      y: "0%",
+      opacity: 1,
+      duration: 0.7,
+      stagger: 0.02,
+      ease: "power3.out",
+    });
+
+    // Stagger the intelligent word characters with custom overlay
+    tl.to(
+      intelligentChars,
+      {
+        y: "0%",
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.035,
+        ease: "power3.out",
+      },
+      "-=0.45"
+    );
+
+    return () => {
+      tl.kill();
+      split.revert();
+    };
+  }, []);
+
   return (
     <section
       id="hero"
@@ -78,7 +159,7 @@ export function HomeHero() {
 
         {/* Headline */}
         <h1
-          className="reveal"
+          ref={titleRef}
           style={{
             fontFamily: "var(--serif)",
             fontSize: "clamp(2.5rem, 4.8vw, 4.6rem)",
@@ -91,7 +172,7 @@ export function HomeHero() {
         >
           Building
           <br />
-          <em style={{ fontStyle: "italic", color: "var(--seal)" }}>intelligent</em>
+          <em className="gradient-text" style={{ fontStyle: "italic" }}>intelligent</em>
           <br />
           systems
         </h1>
