@@ -69,12 +69,13 @@ export function HomeNewsletter() {
               fontFamily: "var(--serif)",
               fontSize: "1.25rem",
               fontStyle: "italic",
-              color: "var(--text2)",
+              color: "var(--text)",
               lineHeight: 1.85,
               display: "block",
               opacity: 0,
               transform: "translateY(10px)",
               transition: `opacity .65s ${i * 0.22}s, transform .65s ${i * 0.22}s`,
+              textShadow: "0 1px 2px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.4)",
             }}
           >
             {line}
@@ -84,7 +85,7 @@ export function HomeNewsletter() {
 
       <div style={{ width: "24px", height: "1px", background: "var(--border2)", margin: "24px auto" }} />
 
-      <p style={{ fontFamily: "var(--mono)", fontSize: "13px", color: "var(--text3)", letterSpacing: ".08em", marginBottom: "28px" }}>
+      <p style={{ fontFamily: "var(--mono)", fontSize: "13px", color: "var(--text)", letterSpacing: ".08em", marginBottom: "28px", textShadow: "0 1px 2px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.5)" }}>
         A periodic dispatch from the lab. Deep work, documented. No noise.
       </p>
 
@@ -138,7 +139,7 @@ export function HomeNewsletter() {
         </button>
       </div>
 
-      <p style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text3)", letterSpacing: ".08em" }}>
+      <p style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--text2)", letterSpacing: ".08em", textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}>
         Arrives occasionally · Unsubscribe anytime
       </p>
     </section>
