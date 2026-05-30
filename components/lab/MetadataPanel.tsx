@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef } from "react";
 import { updateLabEntryMeta, deleteLabEntry } from "@/app/(site)/(private)/lab/actions";
 import { useRouter } from "next/navigation";
+import { Sparkles } from "lucide-react";
 
 interface MetadataPanelProps {
   entryId: string;
@@ -66,6 +67,140 @@ export default function MetadataPanel({
       update({ tags: nextTags });
     }, 350);
   };
+
+  // ── AI ASSISTANT STATES & HANDLERS ────────────────────────────────
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState("");
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [crawledUrl, setCrawledUrl] = useState("");
+  const [hasSuggestions, setHasSuggestions] = useState(false);
+
+  const handleAutoTag = async () => {
+    const titleEl = document.querySelector(".editor-title-input") as HTMLTextAreaElement | null;
+    const editorEl = document.querySelector(".ProseMirror") || document.querySelector(".editor-body");
+    
+    const titleText = titleEl?.value || "";
+    const contentText = editorEl?.textContent || "";
+
+    setAiLoading(true);
+    setAiFeedback("Analyzing content for tags...");
+    setHasSuggestions(false);
+    try {
+      const res = await fetch("/api/ai/autotag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: titleText, content: contentText }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.tags)) {
+          const merged = Array.from(new Set([...tags, ...data.tags])).map(t => t.toLowerCase());
+          setTags(merged);
+          updateTagsDebounced(merged);
+          setAiFeedback(`Suggested & applied tags: ${data.tags.join(", ")}`);
+        } else {
+          setAiFeedback("No tags suggested.");
+        }
+      } else {
+        setAiFeedback("Failed to suggest tags.");
+      }
+    } catch (err) {
+      console.error(err);
+      setAiFeedback("API network error.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAskAssistant = async () => {
+    const editorEl = document.querySelector(".ProseMirror") || document.querySelector(".editor-body");
+    const contentText = editorEl?.textContent || "";
+
+    setAiLoading(true);
+    setAiFeedback("Querying writing assistant...");
+    setHasSuggestions(false);
+    try {
+      const res = await fetch("/api/ai/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: contentText, request: aiPrompt }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAiFeedback(data.suggestion || "No suggestion returned.");
+        setAiPrompt("");
+      } else {
+        setAiFeedback("Failed to reach Nirvana writing assistant.");
+      }
+    } catch (err) {
+      console.error(err);
+      setAiFeedback("API network error.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAutofill = async () => {
+    if (!crawledUrl) return;
+    setAiLoading(true);
+    setAiFeedback("Crawling and analyzing reference url...");
+    setHasSuggestions(false);
+    try {
+      const res = await fetch("/api/ai/resource-fill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: crawledUrl }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAiFeedback(
+          `AI Crawled Reference:\nTitle: ${data.title}\nDomain: ${data.domain}\nType: ${data.type}\nNote: ${data.note}`
+        );
+        // Save references
+        (window as any)._crawledSuggestions = data;
+        setHasSuggestions(true);
+      } else {
+        setAiFeedback("Failed to crawl the url.");
+      }
+    } catch (err) {
+      console.error(err);
+      setAiFeedback("API network error.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applySuggestions = () => {
+    const data = (window as any)._crawledSuggestions;
+    if (!data) return;
+
+    const titleEl = document.querySelector(".editor-title-input") as HTMLTextAreaElement | null;
+    if (titleEl) {
+      titleEl.value = data.title;
+      titleEl.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    if (data.type) {
+      const matchedType = data.type.toLowerCase();
+      setType(matchedType);
+      update({ type: matchedType });
+    }
+
+    if (data.domain) {
+      const domainTag = data.domain.toLowerCase();
+      if (!tags.includes(domainTag)) {
+        const next = [...tags, domainTag];
+        setTags(next);
+        updateTagsDebounced(next);
+      }
+    }
+
+    setAiFeedback(`Applied successfully!\n\nSuggested Note (paste to entry):\n"${data.note}"`);
+    setHasSuggestions(false);
+    (window as any)._crawledSuggestions = null;
+    setCrawledUrl("");
+  };
+
 
   const addTag = () => {
     const t = tagInput.trim().toLowerCase().replace(/^#/, "");
@@ -168,6 +303,180 @@ export default function MetadataPanel({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Nirvana AI Assistant */}
+      <div className="rp-section animate-fade-in" style={{ borderTop: "1px solid var(--border)", paddingTop: "1.25rem", borderBottom: "1px solid var(--border)", paddingBottom: "1.25rem" }}>
+        <div className="rp-label" style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--seal)", textTransform: "uppercase", fontSize: "10px", fontWeight: "bold" }}>
+          <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+          Nirvana AI Assistant
+        </div>
+        
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "10px" }}>
+          {/* Tag Suggestion button */}
+          <button
+            type="button"
+            disabled={aiLoading}
+            onClick={handleAutoTag}
+            style={{
+              width: "100%",
+              fontFamily: "var(--mono)",
+              fontSize: "10px",
+              padding: "6px 8px",
+              background: "var(--bg3)",
+              border: "1px solid var(--border)",
+              color: "var(--text)",
+              borderRadius: "4px",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--seal)"}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--border)"}
+          >
+            {aiLoading ? "Analyzing..." : "Auto-Suggest Tags"}
+          </button>
+
+          {/* Ask Assistant prompt */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+            <textarea
+              placeholder="Ask Nirvana for feedback, edits, or outline ideas..."
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              rows={2}
+              style={{
+                width: "100%",
+                background: "var(--bg4)",
+                border: "1px solid var(--border)",
+                color: "var(--text)",
+                fontSize: "11px",
+                fontFamily: "var(--sans)",
+                padding: "6px",
+                borderRadius: "4px",
+                resize: "none",
+                outline: "none"
+              }}
+            />
+            <button
+              type="button"
+              disabled={aiLoading || !aiPrompt.trim()}
+              onClick={handleAskAssistant}
+              style={{
+                width: "100%",
+                fontFamily: "var(--mono)",
+                fontSize: "10px",
+                padding: "5px 8px",
+                background: "var(--seal)",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                transition: "background 0.2s",
+                opacity: (aiLoading || !aiPrompt.trim()) ? 0.5 : 1
+              }}
+            >
+              {aiLoading ? "Querying..." : "Ask Assistant"}
+            </button>
+          </div>
+
+          {/* Crawler Input */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+            <input
+              type="text"
+              placeholder="Paste reference link/url to crawl..."
+              value={crawledUrl}
+              onChange={(e) => setCrawledUrl(e.target.value)}
+              style={{
+                width: "100%",
+                background: "var(--bg4)",
+                border: "1px solid var(--border)",
+                color: "var(--text)",
+                fontSize: "11px",
+                fontFamily: "var(--sans)",
+                padding: "6px",
+                borderRadius: "4px",
+                outline: "none"
+              }}
+            />
+            <button
+              type="button"
+              disabled={aiLoading || !crawledUrl.trim()}
+              onClick={handleAutofill}
+              style={{
+                width: "100%",
+                fontFamily: "var(--mono)",
+                fontSize: "10px",
+                padding: "5px 8px",
+                background: "var(--bg3)",
+                border: "1px solid var(--border)",
+                color: "var(--text)",
+                borderRadius: "4px",
+                cursor: "pointer",
+                opacity: (aiLoading || !crawledUrl.trim()) ? 0.5 : 1
+              }}
+            >
+              {aiLoading ? "Crawling..." : "Autofill Reference Link"}
+            </button>
+          </div>
+
+          {/* AI Response Display Box */}
+          {aiFeedback && (
+            <div
+              style={{
+                background: "var(--bg4)",
+                border: "1px solid var(--border2)",
+                borderRadius: "4px",
+                padding: "10px",
+                fontSize: "11px",
+                color: "var(--text2)",
+                lineHeight: "1.5",
+                maxHeight: "180px",
+                overflowY: "auto",
+                position: "relative"
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => { setAiFeedback(""); setHasSuggestions(false); }}
+                style={{
+                  position: "absolute",
+                  top: "2px",
+                  right: "6px",
+                  background: "none",
+                  border: "none",
+                  color: "var(--text4)",
+                  cursor: "pointer",
+                  fontSize: "12px"
+                }}
+              >
+                ×
+              </button>
+              <div style={{ whiteSpace: "pre-wrap", marginRight: "12px" }}>
+                {aiFeedback}
+              </div>
+              
+              {hasSuggestions && (
+                <button
+                  type="button"
+                  onClick={applySuggestions}
+                  style={{
+                    marginTop: "8px",
+                    width: "100%",
+                    fontFamily: "var(--mono)",
+                    fontSize: "9px",
+                    padding: "4px",
+                    background: "var(--seal2)",
+                    color: "var(--seal)",
+                    border: "1px solid var(--seal)",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Apply Metadata Suggestions
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Writing goal */}
