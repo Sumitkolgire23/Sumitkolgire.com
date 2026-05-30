@@ -1089,4 +1089,79 @@ html.lenis, html.lenis body {
   color: inherit !important;
 }
 
+/* ══════════════════════════════════════════════════════════
+   INK DATE STAMP
+   ══════════════════════════════════════════════════════════ */
+.ink-date-stamp {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  user-select: none;
+  transform: rotate(-1deg);
+}
+.ink-date-stamp--ghost {
+  color: var(--text3);
+  border: 1px solid var(--border);
+  opacity: 0.72;
+}
+.ink-date-stamp--seal {
+  color: var(--seal);
+  border: 1px solid var(--seal);
+  opacity: 0.68;
+  box-shadow: inset 0 0 0 1px var(--seal2, rgba(196,30,58,0.3));
+}
 
+/* ══════════════════════════════════════════════════════════
+   SECTION RAIL — fixed right-side dot navigation
+   ══════════════════════════════════════════════════════════ */
+.section-rail {
+  position: fixed;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 40;
+}
+.section-rail__dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border2);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.22s ease, transform 0.22s ease;
+}
+.section-rail__dot.active,
+.section-rail__dot:hover {
+  background: var(--seal);
+  transform: scale(1.6);
+}
+.section-rail__label {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  text-transform: uppercase;
+}
+.section-rail__dot:hover .section-rail__label {
+  opacity: 1;
+}
+@media (max-width: 1200px) {
+  .section-rail { display: none; }
+}

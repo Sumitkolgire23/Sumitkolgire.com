@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { getAllTags } from "@/lib/velite";
+import { withAnthropicRetry } from "@/lib/retry";
 
 // Initialize Anthropic client safely
 const apiKey = process.env.ANTHROPIC_API_KEY || "";
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const response = await anthropic.messages.create({
+      const response = await withAnthropicRetry(() => anthropic!.messages.create({
         model: "claude-3-5-haiku-20241022",
         max_tokens: 60,
         temperature: 0.1,
@@ -62,7 +63,7 @@ Return ONLY a valid JSON array of string tags, and absolutely nothing else. No m
             content: `Recommend tags for the following content:\nTitle: ${title || "Untitled"}\nContent:\n${textToAnalyze.substring(0, 3000)}`
           }
         ]
-      });
+      }));
 
       const textOutput = response.content[0].type === "text" ? response.content[0].text.trim() : "";
       

@@ -8,6 +8,8 @@ import {
   jsonb,
   index,
   vector,
+  real,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -154,7 +156,44 @@ export const auditLog = pgTable(
   })
 );
 
-// ── RELATIONS ────────────────────────────────────────────────────────────────
+// 📐 GRAPH EDGES
+// Pairwise cosine similarity edges between content items for knowledge graph visualization
+export const graphEdges = pgTable(
+  "graph_edges",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sourceSlug: text("source_slug").notNull(),
+    targetSlug: text("target_slug").notNull(),
+    similarity: real("similarity").notNull(),
+    reason: text("reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    sourceIdx: index("graph_edges_source_idx").on(t.sourceSlug),
+    targetIdx: index("graph_edges_target_idx").on(t.targetSlug),
+    uniquePair: unique("graph_edges_unique_pair").on(t.sourceSlug, t.targetSlug),
+  })
+);
+
+// 🤖 AI CACHE
+// Cache for AI responses to control costs. cache_key = sha256(prompt). TTL enforced by expiresAt.
+export const aiCache = pgTable(
+  "ai_cache",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    cacheKey: text("cache_key").notNull().unique(),
+    response: text("response").notNull(),
+    model: text("model").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    cacheKeyIdx: index("ai_cache_key_idx").on(t.cacheKey),
+    expiresAtIdx: index("ai_cache_expires_idx").on(t.expiresAt),
+  })
+);
+
+// 🔗 RELATIONS ────────────────────────────────────────────────────────────────
 export const usersRelations = relations(users, ({ many }) => ({
   diaryEntries: many(diaryEntries),
   auditLogs: many(auditLog),

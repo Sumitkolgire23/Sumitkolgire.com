@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { pipeline } from "@huggingface/transformers";
 import { createClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
+import { withAnthropicRetry } from "@/lib/retry";
 import fs from "fs";
 import path from "path";
 
@@ -165,14 +166,16 @@ Let's begin. Speak in the first person as Nirvana.`;
       content: message,
     });
 
-    // 6. Call Anthropic with stream=true
-    const stream = await anthropic.messages.create({
-      model: "claude-3-5-haiku-20241022",
-      max_tokens: 1200,
-      system: systemPrompt,
-      messages: formattedMessages,
-      stream: true,
-    });
+    // 6. Call Anthropic with stream=true (wrapped in retry for resilience)
+    const stream = await withAnthropicRetry(() =>
+      anthropic.messages.create({
+        model: "claude-3-5-haiku-20241022",
+        max_tokens: 1200,
+        system: systemPrompt,
+        messages: formattedMessages,
+        stream: true,
+      })
+    );
 
     // 7. Pipe stream to response
     const encoder = new TextEncoder();

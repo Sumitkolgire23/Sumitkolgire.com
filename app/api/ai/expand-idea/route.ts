@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { withAnthropicRetry } from "@/lib/retry";
 
 // Initialize Anthropic client safely
 const apiKey = process.env.ANTHROPIC_API_KEY || "";
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const response = await anthropic.messages.create({
+      const response = await withAnthropicRetry(() => anthropic!.messages.create({
         model: "claude-3-5-haiku-20241022",
         max_tokens: 1000,
         temperature: 0.7,
@@ -77,7 +78,7 @@ Do not include any explanation, intro text, markdown code blocks (e.g. no \`\`\`
             content: `Expand this seedling idea:\n\n${content}`
           }
         ]
-      });
+      }));
 
       const textOutput = response.content[0].type === "text" ? response.content[0].text.trim() : "";
       
