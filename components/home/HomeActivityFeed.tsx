@@ -704,7 +704,7 @@ export function HomeActivityFeed({
           </div>
 
           {/* Bottom Row: Full Width GitHub Contribution Calendar */}
-          <div className="bg-bg2/25 backdrop-blur-lg border border-border/70 rounded-xl p-6 shadow-xl shadow-black/25 transition-all duration-300 relative overflow-hidden">
+          <div className="bg-bg2/25 backdrop-blur-lg border border-border/70 rounded-xl p-8 md:p-10 shadow-xl shadow-black/25 transition-all duration-300 relative overflow-hidden">
             {loadingContributions && !contributions ? (
               <div className="flex flex-col items-center justify-center py-10 gap-2 text-text4 select-none">
                 <div className="w-4 h-4 border border-t-transparent border-seal animate-spin rounded-full" />
@@ -722,9 +722,9 @@ export function HomeActivityFeed({
                   </div>
                 )}
 
-                <div className={cn("flex flex-col gap-6 transition-all duration-300", isFetchingYear && "opacity-40 scale-[0.99] filter blur-[0.5px]")}>
+                <div className={cn("flex flex-col gap-8 transition-all duration-300", isFetchingYear && "opacity-40 scale-[0.99] filter blur-[0.5px]")}>
                   {/* Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/30 pb-4 gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/30 pb-5 gap-4">
                     <div className="flex flex-col gap-1">
                       <h2 className="font-sans text-[20px] font-bold text-text tracking-tight select-none">
                         {contributions.total} contributions in {selectedYear === 2026 ? "the last year" : selectedYear}
@@ -744,78 +744,81 @@ export function HomeActivityFeed({
                     </a>
                   </div>
 
-                  <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+                  <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch">
                     
-                    {/* Left: Contributions Grid Card */}
-                    <div className="flex-1 bg-bg/40 border border-border/50 rounded-lg p-5 w-full flex flex-col justify-between">
+                    {/* Left: Contributions Grid Card (min-w-0 prevents flex overflow and border clipping!) */}
+                    <div className="flex-1 bg-bg/40 border border-border/50 rounded-lg p-6 md:p-8 min-w-0 flex flex-col justify-between">
                       
                       {/* Scroll Wrapper */}
-                      <div className="overflow-x-auto scrollbar-thin pb-2" style={{ scrollbarWidth: "thin" }}>
-                        <div className="flex gap-[3px] select-none min-w-[760px] p-1">
-                          
-                          {/* Days Column */}
-                          <div className="flex flex-col justify-between text-[9px] font-mono text-text4 pr-3 pt-[16px] select-none h-[88px] leading-[9.5px]">
-                            <span>Mon</span>
-                            <span>Wed</span>
-                            <span>Fri</span>
-                          </div>
-
-                          {/* Main Grid Column */}
-                          <div className="flex-1">
-                            {/* Months Row */}
-                            <div className="relative h-[16px] text-[9px] font-mono text-text4 mb-[5px] select-none">
-                              {getMonthLabels(contributions.weeks).map((lbl, idx) => {
-                                const leftPos = lbl.index * 13;
-                                return (
-                                  <span key={idx} className="absolute" style={{ left: `${leftPos}px` }}>
-                                    {lbl.text}
-                                  </span>
-                                );
-                              })}
+                      <div className="overflow-x-auto scrollbar-thin pb-3 min-w-0 w-full" style={{ scrollbarWidth: "thin" }}>
+                        {/* Centering wrapper centered horizontally within the card bounds */}
+                        <div className="flex justify-center min-w-full">
+                          <div className="flex gap-[3px] select-none min-w-[760px] p-1">
+                            
+                            {/* Days Column */}
+                            <div className="flex flex-col justify-between text-[9px] font-mono text-text4 pr-4 pt-[16px] select-none h-[88px] leading-[9.5px]">
+                              <span>Mon</span>
+                              <span>Wed</span>
+                              <span>Fri</span>
                             </div>
 
-                            {/* Contribution Grid */}
-                            <div className="flex gap-[3px] h-[88px]">
-                              {contributions.weeks.map((week, wIdx) => (
-                                <div key={wIdx} className="flex flex-col gap-[3px]">
-                                  {week.map((day, dIdx) => {
-                                    // Authentic GitHub Green Palette (Hex solid colors, no outlines)
-                                    let cellColor = "rgba(255, 255, 255, 0.04)"; // Empty cell
-                                    if (day.contributionCount > 0) {
-                                      if (day.contributionCount < 4) cellColor = "#0e4429";      // L1
-                                      else if (day.contributionCount < 8) cellColor = "#006d32";  // L2
-                                      else if (day.contributionCount < 14) cellColor = "#26a641"; // L3
-                                      else cellColor = "#39d353";                                 // L4
-                                    }
+                            {/* Main Grid Column */}
+                            <div className="flex-1">
+                              {/* Months Row */}
+                              <div className="relative h-[16px] text-[9px] font-mono text-text4 mb-[5px] select-none">
+                                {getMonthLabels(contributions.weeks).map((lbl, idx) => {
+                                  const leftPos = lbl.index * 13;
+                                  return (
+                                    <span key={idx} className="absolute" style={{ left: `${leftPos}px` }}>
+                                      {lbl.text}
+                                    </span>
+                                  );
+                                })}
+                              </div>
 
-                                    return (
-                                      <div
-                                        key={dIdx}
-                                        className="w-[10px] h-[10px] rounded-[2px] cursor-pointer relative group transition-all duration-150 hover:scale-[1.3] hover:z-10 hover:shadow-[0_0_8px_rgba(61,139,58,0.5)]"
-                                        style={{ backgroundColor: cellColor }}
-                                      >
-                                        {/* Custom Tooltip */}
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[210px] bg-bg/98 border border-border/80 text-[9px] font-mono text-text px-2.5 py-1.5 rounded shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-30 flex flex-col gap-0.5 select-none">
-                                          <span className="font-bold text-text tracking-wide">
-                                            {day.contributionCount} contribution{day.contributionCount === 1 ? "" : "s"}
-                                          </span>
-                                          <span className="text-text4 text-[8px]">
-                                            {new Date(day.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
-                                          </span>
+                              {/* Contribution Grid */}
+                              <div className="flex gap-[3px] h-[88px]">
+                                {contributions.weeks.map((week, wIdx) => (
+                                  <div key={wIdx} className="flex flex-col gap-[3px]">
+                                    {week.map((day, dIdx) => {
+                                      // Authentic GitHub Green Palette (Hex solid colors, no outlines)
+                                      let cellColor = "rgba(255, 255, 255, 0.04)"; // Empty cell
+                                      if (day.contributionCount > 0) {
+                                        if (day.contributionCount < 4) cellColor = "#0e4429";      // L1
+                                        else if (day.contributionCount < 8) cellColor = "#006d32";  // L2
+                                        else if (day.contributionCount < 14) cellColor = "#26a641"; // L3
+                                        else cellColor = "#39d353";                                 // L4
+                                      }
+
+                                      return (
+                                        <div
+                                          key={dIdx}
+                                          className="w-[10px] h-[10px] rounded-[2px] cursor-pointer relative group transition-all duration-150 hover:scale-[1.3] hover:z-10 hover:shadow-[0_0_8px_rgba(61,139,58,0.5)]"
+                                          style={{ backgroundColor: cellColor }}
+                                        >
+                                          {/* Custom Tooltip */}
+                                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[210px] bg-bg/98 border border-border/80 text-[9px] font-mono text-text px-2.5 py-1.5 rounded shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-30 flex flex-col gap-0.5 select-none">
+                                            <span className="font-bold text-text tracking-wide">
+                                              {day.contributionCount} contribution{day.contributionCount === 1 ? "" : "s"}
+                                            </span>
+                                            <span className="text-text4 text-[8px]">
+                                              {new Date(day.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+                                            </span>
+                                          </div>
                                         </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              ))}
-                            </div>
+                                      );
+                                    })}
+                                  </div>
+                                ))}
+                              </div>
 
+                            </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Calendar Footer Info & Legend */}
-                      <div className="flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-text4 mt-4 pt-3 border-t border-border/20 gap-2 select-none">
+                      <div className="flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-text4 mt-6 pt-5 border-t border-border/20 gap-2 select-none">
                         <span className="hover:text-text2 transition-colors cursor-pointer">
                           Learn how we count contributions
                         </span>
@@ -832,6 +835,7 @@ export function HomeActivityFeed({
                       </div>
 
                     </div>
+
 
                     {/* Right: Year Selector Stack */}
                     <div className="flex flex-row lg:flex-col gap-2 w-full lg:w-[80px] shrink-0 select-none">
