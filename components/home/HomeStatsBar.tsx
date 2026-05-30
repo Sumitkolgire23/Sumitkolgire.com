@@ -172,101 +172,110 @@ export function HomeStatsBar({
   return (
     <>
       <div
-        id="stats-bar-wrapper"
+        id="stats-bar-section"
         style={{
-          display: "flex",
           borderTop: "1px solid var(--border)",
           borderBottom: "1px solid var(--border)",
-          margin: "0 40px",
           position: "relative",
           overflow: "hidden",
+          background: "var(--bg)",
         }}
         className="reveal animate-fade-in"
       >
         <div className="dot-grid-bg" />
-
-        {/* 1. Active Projects Count */}
-        <div
-          style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
-        >
+        <div className="section-container">
           <div
-            ref={projectsRef}
-            style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
+            id="stats-bar-wrapper"
+            style={{
+              display: "flex",
+              position: "relative",
+              overflow: "hidden",
+            }}
           >
-            {liveProjects}
-          </div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
-            Active projects
-          </div>
-          <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Always building</div>
-        </div>
-
-        {/* 2. Educational Progress (Static) */}
-        <div
-          style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
-        >
-          <div style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}>3rd</div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
-            Year engineering
-          </div>
-          <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>B.E. AI/ML · 2023–2027</div>
-        </div>
-
-        {/* 3. Live Words Written Count */}
-        <div
-          style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
-        >
-          <div
-            ref={wordsRef}
-            style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
-          >
-            {liveWords.toLocaleString()}
-          </div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
-            Words written
-          </div>
-          <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Lab notebook records</div>
-        </div>
-
-        {/* 4. Live Diary Streak Count */}
-        <div
-          style={{ flex: 1, padding: "24px 28px", transition: "background .25s", cursor: "default" }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
-        >
-          <div style={{ lineHeight: 1, marginBottom: "5.5px", display: "flex", gap: "10px", alignItems: "center" }}>
-            <svg width="22" height="22" viewBox="0 0 28 28" fill="none" style={{ flexShrink: 0 }}>
-              <circle cx="14" cy="14" r="13" stroke="#c41e3a" strokeWidth="1"/>
-              <text fontFamily="'Instrument Serif',serif" fontSize="7" fill="#c41e3a" textAnchor="middle" x="14" y="12" fontStyle="italic">lab</text>
-              <text fontFamily="'Geist Mono',monospace" fontSize="4" fill="#c41e3a" textAnchor="middle" x="14" y="20" letterSpacing=".5">active</text>
-            </svg>
-            <div style={{ fontFamily: "var(--serif)", fontSize: "2.1rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1 }}>
-              <span ref={streakRef}>0</span>
+            {/* 1. Active Projects Count */}
+            <div
+              style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
+            >
+              <div
+                ref={projectsRef}
+                style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
+              >
+                {liveProjects}
+              </div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+                Active projects
+              </div>
+              <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Always building</div>
             </div>
-          </div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
-            Lab diary streak
-          </div>
-          <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>
-            {liveStreak > 0 ? "Daily publishing active" : "Keep writing"}
+
+            {/* 2. Educational Progress (Static) */}
+            <div
+              style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
+            >
+              <div style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}>3rd</div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+                Year engineering
+              </div>
+              <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>B.E. AI/ML · 2023–2027</div>
+            </div>
+
+            {/* 3. Live Words Written Count */}
+            <div
+              style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
+            >
+              <div
+                ref={wordsRef}
+                style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
+              >
+                {liveWords.toLocaleString()}
+              </div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+                Words written
+              </div>
+              <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Lab notebook records</div>
+            </div>
+
+            {/* 4. Live Diary Streak Count */}
+            <div
+              style={{ flex: 1, padding: "24px 28px", transition: "background .25s", cursor: "default" }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
+            >
+              <div style={{ lineHeight: 1, marginBottom: "5.5px", display: "flex", gap: "10px", alignItems: "center" }}>
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none" style={{ flexShrink: 0 }}>
+                  <circle cx="14" cy="14" r="13" stroke="#c41e3a" strokeWidth="1"/>
+                  <text fontFamily="'Instrument Serif',serif" fontSize="7" fill="#c41e3a" textAnchor="middle" x="14" y="12" fontStyle="italic">lab</text>
+                  <text fontFamily="'Geist Mono',monospace" fontSize="4" fill="#c41e3a" textAnchor="middle" x="14" y="20" letterSpacing=".5">active</text>
+                </svg>
+                <div style={{ fontFamily: "var(--serif)", fontSize: "2.1rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1 }}>
+                  <span ref={streakRef}>0</span>
+                </div>
+              </div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+                Lab diary streak
+              </div>
+              <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>
+                {liveStreak > 0 ? "Daily publishing active" : "Keep writing"}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <style>{`
         @media (max-width: 1100px) {
-          #stats-bar-wrapper { margin: 0 28px !important; flex-wrap: wrap; }
+          #stats-bar-wrapper { flex-wrap: wrap; }
           #stats-bar-wrapper > div { min-width: 50%; border-bottom: 1px solid var(--border); }
           #stats-bar-wrapper > div:nth-child(odd) { border-right: 1px solid var(--border); }
         }
         @media (max-width: 680px) {
-          #stats-bar-wrapper { margin: 0 20px !important; flex-direction: column; }
+          #stats-bar-wrapper { flex-direction: column; }
           #stats-bar-wrapper > div { border-right: none !important; }
         }
       `}</style>
