@@ -704,7 +704,7 @@ export function HomeActivityFeed({
           </div>
 
           {/* Bottom Row: Full Width GitHub Contribution Calendar */}
-          <div className="bg-bg2/25 backdrop-blur-lg border border-border/70 rounded-xl p-8 md:p-10 shadow-xl shadow-black/25 transition-all duration-300 relative overflow-hidden">
+          <div className="bg-bg2/25 backdrop-blur-lg border border-border/70 rounded-2xl p-8 md:p-12 shadow-xl shadow-black/25 transition-all duration-300 relative overflow-hidden">
             {loadingContributions && !contributions ? (
               <div className="flex flex-col items-center justify-center py-10 gap-2 text-text4 select-none">
                 <div className="w-4 h-4 border border-t-transparent border-seal animate-spin rounded-full" />
@@ -724,39 +724,60 @@ export function HomeActivityFeed({
 
                 <div className={cn("flex flex-col gap-8 transition-all duration-300", isFetchingYear && "opacity-40 scale-[0.99] filter blur-[0.5px]")}>
                   {/* Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/30 pb-5 gap-4">
-                    <div className="flex flex-col gap-1">
-                      <h2 className="font-sans text-[20px] font-bold text-text tracking-tight select-none">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border/30 pb-6 gap-6">
+                    <div className="flex flex-col gap-1.5">
+                      <h2 className="font-sans text-[22px] md:text-[24px] font-bold text-text tracking-tight select-none">
                         {contributions.total} contributions in {selectedYear === 2026 ? "the last year" : selectedYear}
                       </h2>
-                      <div className="flex items-center gap-2 text-[10px] font-mono text-text4 tracking-wider uppercase select-none">
-                        <GithubIcon className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-2 text-[11px] font-mono text-text3 tracking-wider uppercase select-none">
+                        <GithubIcon className="w-3.5 h-3.5 text-text3" />
                         <span>GitHub Profile Activity (@Sumitkolgire23)</span>
                       </div>
                     </div>
-                    <a 
-                      href="https://github.com/Sumitkolgire23" 
-                      target="_blank" 
-                      rel="noreferrer noopener" 
-                      className="font-mono text-[9.5px] text-seal hover:text-white flex items-center gap-1 select-none font-bold border border-seal/30 hover:border-seal px-3 py-1.5 rounded transition-colors self-start sm:self-auto"
-                    >
-                      view profile ↗
-                    </a>
+                    
+                    {/* Controls (Years + View Profile) */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Year Selector segmented control */}
+                      <div className="flex items-center bg-bg3/65 border border-border/50 rounded-lg p-1 select-none">
+                        {[2026, 2025, 2024].map(yr => (
+                          <button
+                            key={yr}
+                            onClick={() => setSelectedYear(yr)}
+                            className={cn(
+                              "px-3.5 py-1.5 rounded-md font-mono text-[11px] font-bold tracking-wide transition-all duration-200 text-center select-none cursor-pointer",
+                              selectedYear === yr
+                                ? "bg-[#0969da] text-white shadow-sm"
+                                : "text-text3 hover:text-text hover:bg-bg2/40"
+                            )}
+                          >
+                            {yr}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      <a 
+                        href="https://github.com/Sumitkolgire23" 
+                        target="_blank" 
+                        rel="noreferrer noopener" 
+                        className="font-mono text-[10px] text-seal hover:text-white flex items-center gap-1 select-none font-bold border border-seal/30 hover:border-seal px-3.5 py-2 rounded-lg transition-colors"
+                      >
+                        view profile ↗
+                      </a>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch">
-                    
-                    {/* Left: Contributions Grid Card (min-w-0 prevents flex overflow and border clipping!) */}
-                    <div className="flex-1 bg-bg/40 border border-border/50 rounded-lg p-6 md:p-8 min-w-0 flex flex-col justify-between">
+                  <div className="w-full">
+                    {/* Contributions Grid Card */}
+                    <div className="bg-bg/40 border border-border/50 rounded-xl p-8 md:p-10 w-full flex flex-col justify-between shadow-inner">
                       
                       {/* Scroll Wrapper */}
-                      <div className="overflow-x-auto scrollbar-thin pb-3 min-w-0 w-full" style={{ scrollbarWidth: "thin" }}>
-                        {/* Centering wrapper centered horizontally within the card bounds */}
-                        <div className="flex justify-center min-w-full">
-                          <div className="flex gap-[3px] select-none min-w-[760px] p-1">
+                      <div className="overflow-x-auto scrollbar-thin pb-4 w-full" style={{ scrollbarWidth: "thin" }}>
+                        {/* Centering wrapper using w-fit mx-auto to fix flex overflow centering bug */}
+                        <div className="mx-auto w-fit p-1">
+                          <div className="flex gap-[3.5px] select-none">
                             
                             {/* Days Column */}
-                            <div className="flex flex-col justify-between text-[9px] font-mono text-text4 pr-4 pt-[16px] select-none h-[88px] leading-[9.5px]">
+                            <div className="flex flex-col justify-between text-[10px] font-mono text-text4 pr-4 pt-[18px] select-none h-[88px] leading-[9.5px]">
                               <span>Mon</span>
                               <span>Wed</span>
                               <span>Fri</span>
@@ -765,7 +786,7 @@ export function HomeActivityFeed({
                             {/* Main Grid Column */}
                             <div className="flex-1">
                               {/* Months Row */}
-                              <div className="relative h-[16px] text-[9px] font-mono text-text4 mb-[5px] select-none">
+                              <div className="relative h-[18px] text-[10px] font-mono text-text4 mb-[6px] select-none">
                                 {getMonthLabels(contributions.weeks).map((lbl, idx) => {
                                   const leftPos = lbl.index * 13;
                                   return (
@@ -781,7 +802,6 @@ export function HomeActivityFeed({
                                 {contributions.weeks.map((week, wIdx) => (
                                   <div key={wIdx} className="flex flex-col gap-[3px]">
                                     {week.map((day, dIdx) => {
-                                      // Authentic GitHub Green Palette (Hex solid colors, no outlines)
                                       let cellColor = "rgba(255, 255, 255, 0.04)"; // Empty cell
                                       if (day.contributionCount > 0) {
                                         if (day.contributionCount < 4) cellColor = "#0e4429";      // L1
@@ -818,43 +838,23 @@ export function HomeActivityFeed({
                       </div>
 
                       {/* Calendar Footer Info & Legend */}
-                      <div className="flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-text4 mt-6 pt-5 border-t border-border/20 gap-2 select-none">
-                        <span className="hover:text-text2 transition-colors cursor-pointer">
+                      <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-text3 mt-8 pt-6 border-t border-border/20 gap-4 select-none">
+                        <span className="hover:text-text transition-colors cursor-pointer font-medium">
                           Learn how we count contributions
                         </span>
                         
-                        <div className="flex items-center gap-2">
-                          <span>Less</span>
+                        <div className="flex items-center gap-2 bg-bg2/30 px-3 py-1.5 border border-border/30 rounded-lg">
+                          <span className="text-text4 font-semibold mr-1">Less</span>
                           <div className="w-[10px] h-[10px] rounded-[2px] bg-[rgba(255,255,255,0.04)]" />
                           <div className="w-[10px] h-[10px] rounded-[2px] bg-[#0e4429]" />
                           <div className="w-[10px] h-[10px] rounded-[2px] bg-[#006d32]" />
                           <div className="w-[10px] h-[10px] rounded-[2px] bg-[#26a641]" />
                           <div className="w-[10px] h-[10px] rounded-[2px] bg-[#39d353]" />
-                          <span>More</span>
+                          <span className="text-text4 font-semibold ml-1">More</span>
                         </div>
                       </div>
 
                     </div>
-
-
-                    {/* Right: Year Selector Stack */}
-                    <div className="flex flex-row lg:flex-col gap-2 w-full lg:w-[80px] shrink-0 select-none">
-                      {[2026, 2025, 2024].map(yr => (
-                        <button
-                          key={yr}
-                          onClick={() => setSelectedYear(yr)}
-                          className={cn(
-                            "flex-1 lg:flex-none px-4 py-2.5 rounded-lg font-sans text-xs font-bold tracking-wide transition-all duration-200 text-center select-none cursor-pointer border border-transparent",
-                            selectedYear === yr
-                              ? "bg-[#0969da] text-white shadow-md shadow-[#0969da]/20"
-                              : "bg-bg2/40 hover:bg-bg3/70 text-text3 hover:text-text border border-border/40 hover:border-border/80"
-                          )}
-                        >
-                          {yr}
-                        </button>
-                      ))}
-                    </div>
-
                   </div>
                 </div>
               </div>
