@@ -100,7 +100,7 @@ export default function RootLayout({
           rippleSpeed={0.4}
           rippleThickness={0.12}
           rippleIntensityScale={1.5}
-          liquid={true}
+          liquid={false}
           liquidStrength={0.12}
           liquidRadius={1.2}
           liquidWobbleSpeed={5}
@@ -114,6 +114,7 @@ export default function RootLayout({
             height: "100vh",
             zIndex: 0,
             pointerEvents: "none",
+            opacity: 0.15,
           }}
         />
         <SmoothScrollProvider>
