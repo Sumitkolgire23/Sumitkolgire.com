@@ -71,6 +71,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { AskNirvanaPanel } from "@/components/wabi/AskNirvanaPanel";
+
 // ── ROOT LAYOUT ────────────────────────────────────────────
 export default function RootLayout({
   children,
@@ -95,6 +97,7 @@ export default function RootLayout({
             {children}
           </main>
           <SiteFooter />
+          <AskNirvanaPanel />
         </SmoothScrollProvider>
       </body>
     </html>
