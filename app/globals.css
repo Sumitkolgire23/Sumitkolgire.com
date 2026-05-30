@@ -17,7 +17,6 @@
  * and do not participate in the cascade layer system.
  * ──────────────────────────────────────────────────────────
  */
-@layer site-tokens, site-base, site-components, site-utilities;
 
 /* ══════════════════════════════════════════════════════════
    DARK THEME DESIGN SYSTEM — Neural Dark Edition
@@ -26,8 +25,7 @@
    ══════════════════════════════════════════════════════════ */
 
 /* ── CSS CUSTOM PROPERTIES ─────────────────────────────── */
-@layer site-tokens {
-  :root {
+:root {
     /* Dark backgrounds */
     --bg:      #0d0d0e;
     --bg2:     #111113;
@@ -89,7 +87,6 @@
     --content-width: 75ch;
     --site-width: 1100px;
   }
-}
 
 /* ── BASE RESET ────────────────────────────────────────── */
 *, *::before, *::after {
@@ -450,45 +447,41 @@ pre code {
 }
 
 /* ── LAYOUT UTILITIES & RESPONSIVE HELPERS ───────────────
-   Wrapped in site-utilities layer so these single-purpose
-   helpers can be overridden by specific component styles
-   when needed (utility layer has highest precedence).
+   Placed outside cascade layers to prevent Tailwind overrides.
    ────────────────────────────────────────────────────────── */
-@layer site-utilities {
-  /* ── VISIBILITY UTILITIES ─────────────────────────────── */
-  .hidden-mobile { display: none !important; }
-  @media (min-width: 640px) {
-    .hidden-mobile { display: flex !important; }
-  }
-  .show-mobile { display: flex !important; }
-  @media (min-width: 640px) {
-    .show-mobile { display: none !important; }
-  }
+/* ── VISIBILITY UTILITIES ─────────────────────────────── */
+.hidden-mobile { display: none !important; }
+@media (min-width: 640px) {
+  .hidden-mobile { display: flex !important; }
+}
+.show-mobile { display: flex !important; }
+@media (min-width: 640px) {
+  .show-mobile { display: none !important; }
+}
 
-  /* ── GRID UTILITIES ──────────────────────────────────── */
-  .grid-responsive-3 {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-  @media (min-width: 640px) {
-    .grid-responsive-3 { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (min-width: 1024px) {
-    .grid-responsive-3 { grid-template-columns: repeat(3, 1fr); }
-  }
+/* ── GRID UTILITIES ──────────────────────────────────── */
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+@media (min-width: 640px) {
+  .grid-responsive-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .grid-responsive-3 { grid-template-columns: repeat(3, 1fr); }
+}
 
-  .grid-responsive-2 {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  @media (min-width: 640px) {
-    .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
-  }
-} /* end @layer site-utilities */
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ── UNLAYERED GLOBAL LAYOUT CLASSES ────────────────────────
    Placed outside cascade layers to override Tailwind's universal unlayered resets
