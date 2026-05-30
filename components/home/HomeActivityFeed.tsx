@@ -13,6 +13,7 @@ import {
   GitBranch
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GlowCard } from "@/components/ui/GlowCard";
 
 // ── TYPES ───────────────────────────────────────────────────────────────────
 interface CommitItem {
@@ -86,61 +87,159 @@ const GitBranchTree = ({ idx }: { idx: number }) => {
         viewBox="0 0 30 100"
         preserveAspectRatio="none"
       >
-        {/* Git tree drawing based on commit index */}
+        {/* Git tree drawing based on commit index with active packet flow animations */}
         {idx === 0 && (
           <>
             {/* Main track */}
-            <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/60" />
-            {/* Branch merge curve from right */}
-            <path d="M 25 0 C 25 25, 15 35, 15 50" className="stroke-gold/50" />
+            <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/40" />
+            {/* Branch merge curve from right with active flow */}
+            <path
+              d="M 25 0 C 25 25, 15 35, 15 50"
+              className="stroke-gold/70 animate-[branch-flow_1.8s_infinite_linear]"
+              strokeDasharray="4 4"
+            />
             {/* glowing main Commit Node */}
-            <circle cx="15" cy="50" r="3.5" className="fill-bg stroke-seal stroke-[2] drop-shadow-[0_0_4px_var(--seal)]" />
+            <circle
+              cx="15"
+              cy="50"
+              r="4"
+              className="fill-bg stroke-seal stroke-[2] animate-[pulse_2s_infinite]"
+              style={{ filter: "drop-shadow(0 0 4px var(--seal))" }}
+            />
           </>
         )}
         {idx === 1 && (
           <>
-            {/* Main track */}
-            <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/60" />
+            {/* Main track with active flow */}
+            <line
+              x1="15"
+              y1="0"
+              x2="15"
+              y2="100"
+              className="stroke-seal/70 animate-[branch-flow_2.2s_infinite_linear]"
+              strokeDasharray="5 5"
+            />
             {/* Parallel Feature Branch track */}
             <line x1="25" y1="0" x2="25" y2="100" className="stroke-gold/40" strokeDasharray="3 3" />
             {/* glowing main Commit Node */}
-            <circle cx="15" cy="50" r="3.5" className="fill-bg stroke-seal stroke-[2] drop-shadow-[0_0_4px_var(--seal)]" />
+            <circle
+              cx="15"
+              cy="50"
+              r="4"
+              className="fill-bg stroke-seal stroke-[2] animate-[pulse_2s_infinite]"
+              style={{ filter: "drop-shadow(0 0 4px var(--seal))" }}
+            />
           </>
         )}
         {idx === 2 && (
           <>
             {/* Main track */}
             <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/40" />
-            {/* active Feature Branch track */}
-            <line x1="25" y1="0" x2="25" y2="100" className="stroke-gold/60" />
+            {/* active Feature Branch track with active flow */}
+            <line
+              x1="25"
+              y1="0"
+              x2="25"
+              y2="100"
+              className="stroke-gold/70 animate-[branch-flow_1.5s_infinite_linear]"
+              strokeDasharray="4 4"
+            />
             {/* glowing Feature Commit Node */}
-            <circle cx="25" cy="50" r="3.5" className="fill-bg stroke-gold stroke-[2] drop-shadow-[0_0_4px_var(--gold)]" />
+            <circle
+              cx="25"
+              cy="50"
+              r="4"
+              className="fill-bg stroke-gold stroke-[2] animate-[pulse_2s_infinite]"
+              style={{ filter: "drop-shadow(0 0 4px var(--gold))" }}
+            />
           </>
         )}
         {idx === 3 && (
           <>
-            {/* Main track */}
-            <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/60" />
+            {/* Main track with active flow */}
+            <line
+              x1="15"
+              y1="0"
+              x2="15"
+              y2="100"
+              className="stroke-seal/70 animate-[branch-flow_2s_infinite_linear]"
+              strokeDasharray="5 5"
+            />
             {/* Hotfix branch splitting off to left */}
-            <path d="M 15 30 C 15 45, 5 55, 5 100" className="stroke-sky/50" />
+            <path
+              d="M 15 30 C 15 45, 5 55, 5 100"
+              className="stroke-sky/50 animate-[branch-flow_1.6s_infinite_linear]"
+              strokeDasharray="4 4"
+            />
             {/* Node on Main */}
-            <circle cx="15" cy="30" r="3.5" className="fill-bg stroke-seal stroke-[2] drop-shadow-[0_0_4px_var(--seal)]" />
+            <circle
+              cx="15"
+              cy="30"
+              r="4"
+              className="fill-bg stroke-seal stroke-[2] animate-[pulse_2s_infinite]"
+              style={{ filter: "drop-shadow(0 0 4px var(--seal))" }}
+            />
           </>
         )}
         {idx === 4 && (
           <>
             {/* Main track */}
-            <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/60" />
-            {/* Hotfix track parallel */}
-            <line x1="5" y1="0" x2="5" y2="50" className="stroke-sky/40" />
+            <line x1="15" y1="0" x2="15" y2="100" className="stroke-seal/40" />
+            {/* Hotfix track parallel with active flow */}
+            <line
+              x1="5"
+              y1="0"
+              x2="5"
+              y2="50"
+              className="stroke-sky/60 animate-[branch-flow_2.5s_infinite_linear]"
+              strokeDasharray="4 4"
+            />
             {/* Hotfix merge curve back to main */}
             <path d="M 5 50 C 5 70, 15 80, 15 95" className="stroke-sky/40" />
             {/* Node on Main */}
-            <circle cx="15" cy="40" r="3.5" className="fill-bg stroke-seal stroke-[2] drop-shadow-[0_0_4px_var(--seal)]" />
+            <circle
+              cx="15"
+              cy="40"
+              r="4"
+              className="fill-bg stroke-seal stroke-[2]"
+              style={{ filter: "drop-shadow(0 0 4px var(--seal))" }}
+            />
           </>
         )}
       </svg>
     </div>
+  );
+};
+
+// ── CUSTOM OFFLINE-SAFE GITHUB AVATAR COMPONENT ───────────────────────────
+const GithubAvatar = ({ avatarUrl, username }: { avatarUrl: string; username: string }) => {
+  const [hasError, setHasError] = useState(false);
+
+  // Generate clean initials from the username, e.g. "SK" for "@Sumitkolgire23"
+  const initials = username
+    ? username.replace(/^@/, "").substring(0, 2).toUpperCase()
+    : "SK";
+
+  if (hasError || !avatarUrl) {
+    return (
+      <div 
+        className="w-8 h-8 rounded border border-seal/45 bg-bg2 flex items-center justify-center font-mono text-[9px] font-bold text-seal select-none tracking-normal shadow-[0_0_8px_rgba(196,30,58,0.12)] transition-all duration-300 group-hover:border-seal group-hover:text-text group-hover:shadow-[0_0_12px_rgba(196,30,58,0.25)] relative overflow-hidden"
+        title={username}
+      >
+        <span className="relative z-10">{initials}</span>
+        {/* Subtle retro overlay grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(196,30,58,0.08)_0.5px,transparent_0.5px)] bg-[size:3px_3px] pointer-events-none opacity-50" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={avatarUrl}
+      alt={username}
+      className="w-8 h-8 rounded border border-border/80 bg-bg transition-all duration-300 group-hover:scale-105 group-hover:border-seal/60"
+      onError={() => setHasError(true)}
+    />
   );
 };
 
@@ -476,10 +575,10 @@ export function HomeActivityFeed({
                   </div>
                 ) : (
                   commits.map((commit, idx) => (
-                    <div
+                    <GlowCard
                       key={commit.sha}
                       className={cn(
-                        "group border border-border/30 hover:border-border/80 hover:-translate-y-[1px] p-3 rounded bg-bg3/10 backdrop-blur-sm transition-all duration-300 flex gap-1.5 items-stretch shadow-sm",
+                        "group border border-border/30 hover:border-border/60 hover:-translate-y-[1px] p-3.5 rounded bg-bg3/15 backdrop-blur-sm transition-all duration-300 flex gap-3 items-stretch shadow-sm cursor-pointer",
                         "animate-ink-fade"
                       )}
                       style={{ animationDelay: `${idx * 40}ms` }}
@@ -487,16 +586,10 @@ export function HomeActivityFeed({
                       {/* Visual Contribution tree element on left of each commit */}
                       <GitBranchTree idx={idx} />
                       
-                      <div className="relative shrink-0 flex items-center pr-1 select-none">
-                        <img
-                          src={commit.author.avatar}
-                          alt={commit.author.username}
-                          className="w-8 h-8 rounded border border-border/80 bg-bg transition-transform duration-300 group-hover:scale-105"
-                          onError={(e) => {
-                            e.currentTarget.src = "https://github.com/identicons/sumit.png";
-                          }}
-                        />
-                        <div className="absolute inset-0 rounded border border-seal/0 group-hover:border-seal/40 transition-colors duration-300" />
+                      {/* Visual Avatar container centered vertically and restricted from stretching */}
+                      <div className="w-8 h-8 relative shrink-0 select-none self-center flex items-center justify-center">
+                        <GithubAvatar avatarUrl={commit.author.avatar} username={commit.author.username} />
+                        <div className="absolute inset-0 rounded border border-seal/0 group-hover:border-seal/40 transition-colors duration-300 pointer-events-none" />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -527,7 +620,7 @@ export function HomeActivityFeed({
                           </a>
                         </div>
                       </div>
-                    </div>
+                    </GlowCard>
                   ))
                 )}
               </div>
@@ -728,6 +821,11 @@ export function HomeActivityFeed({
           0% { opacity: 0.985; }
           50% { opacity: 1; }
           100% { opacity: 0.99; }
+        }
+        @keyframes branch-flow {
+          to {
+            stroke-dashoffset: -20;
+          }
         }
       `}</style>
     </section>
