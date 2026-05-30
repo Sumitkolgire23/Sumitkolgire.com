@@ -1,0 +1,31 @@
+name: Supabase Database Keepalive
+
+on:
+  schedule:
+    - cron: '0 0 */5 * *' # Run at 00:00 every 5 days
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase database REST API
+        run: |
+          if [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ] || [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "[WARNING] Supabase credentials secrets are missing in repository. Skipping ping."
+            exit 0
+          fi
+          
+          echo "Pinging page_views endpoint to generate DB activity..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X GET "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/page_views?limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
+          
+          echo "HTTP Response Status Code: $response"
+          if [ "$response" -eq 200 ] || [ "$response" -eq 204 ] || [ "$response" -eq 406 ]; then
+            echo "[SUCCESS] Successfully generated activity on Supabase database."
+          else
+            echo "[ERROR] Health check query returned status code: $response"
+            exit 1
+          fi

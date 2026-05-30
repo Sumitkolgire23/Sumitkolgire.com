@@ -1,0 +1,33 @@
+name: Weekly Database Backup
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Run at 00:00 every Sunday
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  db-backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+      - name: Export pg_dump Archive
+        run: |
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "[WARNING] DATABASE_URL secret is missing in repository settings. Skipping dump."
+            exit 0
+          fi
+          
+          echo "Executing pg_dump from connection string..."
+          pg_dump "${{ secrets.DATABASE_URL }}" -Fc --no-owner --no-acl > backup.dump
+          echo "[SUCCESS] Database dump complete."
+          
+      - name: Upload Backup as Secure Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup-${{ github.run_id }}
+          path: backup.dump
+          retention-days: 14 # Auto-expired to preserve security
