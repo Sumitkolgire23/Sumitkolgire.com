@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import React from "react";
-import { getArticleBySlug, getArticles, getRelatedArticles, urlSlug } from "@/lib/velite";
+import { getArticleBySlug, getArticles, urlSlug } from "@/lib/velite";
+import { getSemanticRelatedPosts } from "@/lib/semantic";
+import { generateInsightBadge } from "@/lib/ai-helper";
 import { MDXContent } from "@/components/mdx-content";
 import { InkDivider } from "@/components/wabi/InkDivider";
 import { TableOfContents } from "@/components/wabi/TableOfContents";
 import { ReactionBar } from "@/components/wabi/ReactionBar";
+import { ScrollMemory } from "@/components/wabi/ScrollMemory";
+import { ReaderControls } from "@/components/wabi/ReaderControls";
 import Link from "next/link";
 import { GlowCard } from "@/components/ui/GlowCard";
 
@@ -56,10 +60,23 @@ export default async function ArticlePage({
   const article = getArticleBySlug(slug);
   if (!article) notFound();
 
-  const related = getRelatedArticles(article.slug, article.tags, 3);
+  // Fetch semantic related posts and dynamic AI insight badge
+  const [related, insight] = await Promise.all([
+    getSemanticRelatedPosts(article.slug, 3),
+    generateInsightBadge(article.title, article.excerpt, article.slug),
+  ]);
 
   return (
     <>
+      {/* ── READING PROGRESS BAR ────────────────────── */}
+      <div className="reading-bar css-scroll" aria-hidden="true" />
+
+      {/* ── SPATIAL MEMORY ──────────────────────────── */}
+      <ScrollMemory />
+
+      {/* ── READER CONTROLS ─────────────────────────── */}
+      <ReaderControls />
+
       {/* ── ARTICLE HEADER ──────────────────────────── */}
       
       <div 
@@ -130,6 +147,34 @@ export default async function ArticlePage({
               >
                 {article.excerpt}
               </p>
+
+              {/* Nirvana Insight Badge */}
+              {insight && (
+                <div
+                  style={{
+                    background: "rgba(196, 30, 58, 0.02)",
+                    border: "1px solid rgba(196, 30, 58, 0.15)",
+                    padding: "12px 18px",
+                    borderRadius: "4px",
+                    marginBottom: "1.5rem",
+                    maxWidth: "52ch",
+                  }}
+                  className="animate-fade-in"
+                >
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "4px" }}>
+                    <span className="relative flex h-2 w-2 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-seal opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-seal"></span>
+                    </span>
+                    <span style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--seal)", letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 600 }}>
+                      Nirvana Insight
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "12.5px", fontStyle: "italic", color: "var(--text2)", margin: 0, lineHeight: 1.6 }}>
+                    {insight}
+                  </p>
+                </div>
+              )}
 
               {/* Meta row */}
               <div
@@ -272,36 +317,49 @@ export default async function ArticlePage({
                 Related Writing
               </h2>
               <div className="grid-responsive-3">
-                {related.map((rel) => (
-                  <Link key={rel.slug} href={`/articles/${urlSlug(rel.slug)}`} style={{ textDecoration: "none" }}>
-                    <GlowCard style={{ padding: "1.5rem", border: "1px solid var(--border)", transition: "border-color 0.2s" }} className="article-card-lift">
-                      <p
-                        style={{
-                          fontFamily: "var(--mono)",
-                          fontSize: "0.65rem",
-                          color: "var(--seal)",
-                          marginBottom: "0.4rem",
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {new Date(rel.date).getFullYear()}
-                      </p>
-                      <h3
-                        style={{
-                          fontFamily: "var(--serif)",
-                          fontSize: "0.95rem",
-                          fontWeight: 700,
-                          color: "var(--ink)",
-                          lineHeight: 1.3,
-                          margin: 0,
-                        }}
-                      >
-                        {rel.title}
-                      </h3>
-                    </GlowCard>
-                  </Link>
-                ))}
+                {related.map(({ item, type, similarity, connectionReason }) => {
+                  const href = type === "article" ? `/articles/${urlSlug(item.slug)}` :
+                               type === "perspective" ? `/perspectives/${urlSlug(item.slug)}` :
+                               type === "project" ? `/projects/${urlSlug(item.slug)}` : `/docs/${urlSlug(item.slug)}`;
+                  return (
+                    <Link key={item.slug} href={href} style={{ textDecoration: "none" }}>
+                      <GlowCard style={{ padding: "1.5rem", border: "1px solid var(--border)", transition: "border-color 0.2s" }} className="article-card-lift">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.4rem" }}>
+                          <p
+                            style={{
+                              fontFamily: "var(--mono)",
+                              fontSize: "0.65rem",
+                              color: "var(--seal)",
+                              letterSpacing: "0.08em",
+                              textTransform: "uppercase",
+                              margin: 0,
+                            }}
+                          >
+                            {type} · {item.date ? new Date(item.date).getFullYear() : "Lab"}
+                          </p>
+                          <span style={{ fontFamily: "var(--mono)", fontSize: "8px", color: "var(--text4)" }}>
+                            Match: {Math.round(similarity * 100)}%
+                          </span>
+                        </div>
+                        <h3
+                          style={{
+                            fontFamily: "var(--serif)",
+                            fontSize: "0.95rem",
+                            fontWeight: 700,
+                            color: "var(--ink)",
+                            lineHeight: 1.3,
+                            marginBottom: "8px",
+                          }}
+                        >
+                          {item.title}
+                        </h3>
+                        <p style={{ fontSize: "11px", color: "var(--text3)", fontStyle: "italic", borderLeft: "1px solid var(--border2)", paddingLeft: "8px", margin: 0, lineHeight: 1.5 }}>
+                          {connectionReason}
+                        </p>
+                      </GlowCard>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </section>
