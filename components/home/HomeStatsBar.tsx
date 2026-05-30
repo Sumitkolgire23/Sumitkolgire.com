@@ -1,56 +1,86 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getFeatureFlags } from "@/lib/features";
+import { createClient } from "@/utils/supabase/client";
 
-export function HomeStatsBar({ streak, projectCount = 7 }: { streak: number; projectCount?: number }) {
-  const countRef = useRef<HTMLDivElement>(null);
+interface HomeStatsBarProps {
+  streak: number;
+  projectCount: number;
+  totalWords: number;
+}
+
+export function HomeStatsBar({
+  streak,
+  projectCount,
+  totalWords,
+}: HomeStatsBarProps) {
+  // Live states for Realtime updates
+  const [liveProjects, setLiveProjects] = useState(projectCount);
+  const [liveStreak, setLiveStreak] = useState(streak);
+  const [liveWords, setLiveWords] = useState(totalWords);
+
+  // References for count-up DOM nodes
+  const projectsRef = useRef<HTMLDivElement>(null);
   const streakRef = useRef<HTMLSpanElement>(null);
+  const wordsRef = useRef<HTMLDivElement>(null);
 
+  // References to preserve values across animation ticks
+  const prevProjects = useRef(0);
+  const prevStreak = useRef(0);
+  const prevWords = useRef(0);
+
+  // 1. D3-style GSAP Counter Animations
   useEffect(() => {
-    const el = countRef.current;
-    if (!el) return;
-
     // Register ScrollTrigger safely
     gsap.registerPlugin(ScrollTrigger);
 
-    // Check feature flags
-    if (!getFeatureFlags().scrollAnimations) {
-      el.textContent = String(projectCount);
-      if (streakRef.current) streakRef.current.textContent = String(streak);
+    const checkAnimations = getFeatureFlags().scrollAnimations;
+    const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!checkAnimations || reducedMotion) {
+      if (projectsRef.current) projectsRef.current.textContent = String(liveProjects);
+      if (streakRef.current) streakRef.current.textContent = String(liveStreak);
+      if (wordsRef.current) wordsRef.current.textContent = liveWords.toLocaleString();
+      
+      prevProjects.current = liveProjects;
+      prevStreak.current = liveStreak;
+      prevWords.current = liveWords;
       return;
     }
 
-    // Set initial text
-    el.textContent = "0";
-
-    const obj = { val: 0 };
-    const anim = gsap.to(obj, {
-      val: projectCount,
-      duration: 1.5,
+    // Projects count-up
+    const projectsObj = { val: prevProjects.current };
+    const projectsAnim = gsap.to(projectsObj, {
+      val: liveProjects,
+      duration: 1.2,
       ease: "power2.out",
       onUpdate: () => {
-        el.textContent = String(Math.floor(obj.val));
+        if (projectsRef.current) {
+          projectsRef.current.textContent = String(Math.floor(projectsObj.val));
+        }
       },
       scrollTrigger: {
-        trigger: el,
+        trigger: projectsRef.current,
         start: "top 95%",
         toggleActions: "play none none none",
       },
     });
 
+    // Streak count-up
     let streakAnim: any;
-    if (streakRef.current && streak > 0) {
-      streakRef.current.textContent = "0";
-      const streakObj = { val: 0 };
+    if (streakRef.current) {
+      const streakObj = { val: prevStreak.current };
       streakAnim = gsap.to(streakObj, {
-        val: streak,
-        duration: 1.5,
+        val: liveStreak,
+        duration: 1.2,
         ease: "power2.out",
         onUpdate: () => {
-          if (streakRef.current) streakRef.current.textContent = String(Math.floor(streakObj.val));
+          if (streakRef.current) {
+            streakRef.current.textContent = String(Math.floor(streakObj.val));
+          }
         },
         scrollTrigger: {
           trigger: streakRef.current,
@@ -60,15 +90,84 @@ export function HomeStatsBar({ streak, projectCount = 7 }: { streak: number; pro
       });
     }
 
+    // Words count-up
+    let wordsAnim: any;
+    if (wordsRef.current) {
+      const wordsObj = { val: prevWords.current };
+      wordsAnim = gsap.to(wordsObj, {
+        val: liveWords,
+        duration: 1.5,
+        ease: "power2.out",
+        onUpdate: () => {
+          if (wordsRef.current) {
+            wordsRef.current.textContent = Math.floor(wordsObj.val).toLocaleString();
+          }
+        },
+        scrollTrigger: {
+          trigger: wordsRef.current,
+          start: "top 95%",
+          toggleActions: "play none none none",
+        },
+      });
+    }
+
+    // Update refs to current targets for subsequent mutations
+    prevProjects.current = liveProjects;
+    prevStreak.current = liveStreak;
+    prevWords.current = liveWords;
+
     return () => {
-      anim.kill();
-      if (anim.scrollTrigger) anim.scrollTrigger.kill();
+      projectsAnim.kill();
+      if (projectsAnim.scrollTrigger) projectsAnim.scrollTrigger.kill();
       if (streakAnim) {
         streakAnim.kill();
         if (streakAnim.scrollTrigger) streakAnim.scrollTrigger.kill();
       }
+      if (wordsAnim) {
+        wordsAnim.kill();
+        if (wordsAnim.scrollTrigger) wordsAnim.scrollTrigger.kill();
+      }
     };
-  }, [streak, projectCount]);
+  }, [liveProjects, liveStreak, liveWords]);
+
+  // 2. Realtime listener to refresh stats upon mutations
+  useEffect(() => {
+    const supabase = createClient();
+    if (!supabase) return;
+
+    const refreshStats = async () => {
+      try {
+        const res = await fetch("/api/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setLiveProjects(data.projectCount);
+          setLiveStreak(data.streak);
+          setLiveWords(data.wordCount);
+        }
+      } catch (err) {
+        console.error("[HomeStatsBar] Failed to reload stats:", err);
+      }
+    };
+
+    const channel = supabase
+      .channel("stats-realtime-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "diary_entries" },
+        refreshStats
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "ideas" },
+        refreshStats
+      );
+
+    channel.subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return (
     <>
@@ -82,69 +181,80 @@ export function HomeStatsBar({ streak, projectCount = 7 }: { streak: number; pro
           position: "relative",
           overflow: "hidden",
         }}
-        className="reveal"
+        className="reveal animate-fade-in"
       >
         <div className="dot-grid-bg" />
-        {/* Active projects */}
+
+        {/* 1. Active Projects Count */}
         <div
           style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
           onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
         >
           <div
-            ref={countRef}
+            ref={projectsRef}
             style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
           >
-            {projectCount}
+            {liveProjects}
           </div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>Active projects</div>
+          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+            Active projects
+          </div>
           <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Always building</div>
         </div>
 
-        {/* Year */}
+        {/* 2. Educational Progress (Static) */}
         <div
           style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
           onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
         >
           <div style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}>3rd</div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>Year engineering</div>
+          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+            Year engineering
+          </div>
           <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>B.E. AI/ML · 2023–2027</div>
         </div>
 
-        {/* Ideas */}
+        {/* 3. Live Words Written Count */}
         <div
           style={{ flex: 1, padding: "24px 28px", borderRight: "1px solid var(--border)", transition: "background .25s", cursor: "default" }}
           onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
         >
-          <div style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}>∞</div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>Ideas in lab</div>
-          <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Always planting</div>
+          <div
+            ref={wordsRef}
+            style={{ fontFamily: "var(--serif)", fontSize: "2.2rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1, marginBottom: "5px" }}
+          >
+            {liveWords.toLocaleString()}
+          </div>
+          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+            Words written
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>Lab notebook records</div>
         </div>
 
-        {/* Streak */}
+        {/* 4. Live Diary Streak Count */}
         <div
           style={{ flex: 1, padding: "24px 28px", transition: "background .25s", cursor: "default" }}
           onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.02)")}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "")}
         >
-          <div style={{ lineHeight: 1, marginBottom: "5px" }}>
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <div style={{ lineHeight: 1, marginBottom: "5.5px", display: "flex", gap: "10px", alignItems: "center" }}>
+            <svg width="22" height="22" viewBox="0 0 28 28" fill="none" style={{ flexShrink: 0 }}>
               <circle cx="14" cy="14" r="13" stroke="#c41e3a" strokeWidth="1"/>
               <text fontFamily="'Instrument Serif',serif" fontSize="7" fill="#c41e3a" textAnchor="middle" x="14" y="12" fontStyle="italic">lab</text>
               <text fontFamily="'Geist Mono',monospace" fontSize="4" fill="#c41e3a" textAnchor="middle" x="14" y="20" letterSpacing=".5">active</text>
             </svg>
+            <div style={{ fontFamily: "var(--serif)", fontSize: "2.1rem", fontStyle: "italic", color: "var(--text)", lineHeight: 1 }}>
+              <span ref={streakRef}>0</span>
+            </div>
           </div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>Lab diary</div>
+          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", color: "var(--text3)", letterSpacing: ".12em", textTransform: "uppercase" }}>
+            Lab diary streak
+          </div>
           <div style={{ fontSize: "11px", color: "var(--text4)", marginTop: "2px" }}>
-            {streak > 0 ? (
-              <span>
-                <span ref={streakRef}>0</span> day streak
-              </span>
-            ) : (
-              "Keep writing"
-            )}
+            {liveStreak > 0 ? "Daily publishing active" : "Keep writing"}
           </div>
         </div>
       </div>

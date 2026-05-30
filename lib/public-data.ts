@@ -60,7 +60,7 @@ export const getPublicDiaryEntries = unstable_cache(
   { revalidate: 300, tags: ["diary"] }
 );
 
-async function _getDiaryStreak(): Promise<number> {
+export async function _getDiaryStreak(): Promise<number> {
   const supabase = createPublicClient();
   if (!supabase) return 0;
 
@@ -208,16 +208,25 @@ async function _getPublicResources(): Promise<PublicResource[]> {
   try {
     const { data, error } = await supabase
       .from("resources")
-      .select("id, title, url, note, domain, type, created_at")
-      .eq("is_public", true)
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false });
+      .select("id, title, url, note, domain, type, added_at")
+      .eq("is_active", true)
+      .order("added_at", { ascending: false });
 
     if (error) {
       console.error("[getPublicResources]", error.message);
       return [];
     }
-    return data ?? [];
+    
+    // Map added_at to created_at for compatibility with frontend type definitions
+    return (data ?? []).map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      url: item.url,
+      note: item.note,
+      domain: item.domain,
+      type: item.type,
+      created_at: item.added_at,
+    }));
   } catch (err) {
     console.error("[getPublicResources] Network error:", err);
     return [];
@@ -229,5 +238,34 @@ export const getPublicResources = unstable_cache(
   () => _getPublicResources(),
   ["public-resources"],
   { revalidate: 3600, tags: ["resources"] }
+);
+
+export async function _getPublicDiaryWordCount(): Promise<number> {
+  const supabase = createPublicClient();
+  if (!supabase) return 0;
+
+  try {
+    const { data, error } = await supabase
+      .from("diary_entries")
+      .select("word_count")
+      .eq("is_public", true)
+      .is("deleted_at", null);
+
+    if (error || !data) {
+      console.error("[getPublicDiaryWordCount]", error?.message);
+      return 0;
+    }
+    return data.reduce((sum, row) => sum + (row.word_count || 0), 0);
+  } catch (err) {
+    console.error("[getPublicDiaryWordCount] Network error:", err);
+    return 0;
+  }
+}
+
+/** Cached: revalidates every 5 minutes. Tag: "diary" */
+export const getPublicDiaryWordCount = unstable_cache(
+  () => _getPublicDiaryWordCount(),
+  ["public-diary-word-count"],
+  { revalidate: 300, tags: ["diary"] }
 );
 
