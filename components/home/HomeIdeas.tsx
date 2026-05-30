@@ -57,7 +57,7 @@ export function HomeIdeas({
           <>
             {/* Ideas wall — 4 columns with staggered offsets */}
             <div
-              className="reveal"
+              className="reveal ideas-wall"
               style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px", position: "relative", zIndex: 1 }}
             >
               {ideas.map((idea, i) => {
