@@ -29,6 +29,13 @@
       "when": 1780128699131,
       "tag": "0003_zippy_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780131011406,
+      "tag": "0004_add_graph_edges_and_ai_cache",
+      "breakpoints": true
     }
   ]
 }
