@@ -5,7 +5,7 @@ import { SiteNavbar } from "@/components/layout/SiteNavbar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { DarkPageEffects } from "@/components/layout/DarkPageEffects";
 import { SmoothScrollProvider } from "@/components/layout/SmoothScrollProvider";
-import { AuroraBackground } from "@/components/effects/AuroraBackground";
+import { PixelBlast } from "@/components/effects/PixelBlast";
 
 // ── FONTS ─────────────────────────────────────────────────
 // Self-hosted via next/font — zero FOUT, zero CLS
@@ -89,7 +89,33 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <AuroraBackground />
+        <PixelBlast
+          variant="diamond"
+          pixelSize={3}
+          color="#db2424"
+          patternScale={3.5}
+          patternDensity={0.9}
+          pixelSizeJitter={0.5}
+          enableRipples={true}
+          rippleSpeed={0.4}
+          rippleThickness={0.12}
+          rippleIntensityScale={1.5}
+          liquid={true}
+          liquidStrength={0.12}
+          liquidRadius={1.2}
+          liquidWobbleSpeed={5}
+          speed={0.6}
+          edgeFade={0.25}
+          transparent={true}
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
         <SmoothScrollProvider>
           <DarkPageEffects />
           <SiteNavbar />
