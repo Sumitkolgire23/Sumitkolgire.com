@@ -1193,7 +1193,7 @@ html.lenis, html.lenis body {
   .section-rail { display: none; }
 }
 
-/* Parallax performance — promote to GPU composite layer */
+/* Parallax performance - promote to GPU composite layer */
 .aurora-wrap,
 .hero-text-col {
   will-change: transform;
