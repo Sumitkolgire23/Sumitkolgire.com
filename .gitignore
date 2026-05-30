@@ -54,3 +54,6 @@ proxy.ts
 # Documentation
 Documentation/
 .vercel
+
+# Scratch directory
+/scratch

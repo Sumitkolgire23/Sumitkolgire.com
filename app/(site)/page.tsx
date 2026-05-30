@@ -5,6 +5,7 @@ import {
   getDiaryStreak,
   getPublicIdeas,
   getIdeasStats,
+  getPublicDiaryWordCount,
 } from "@/lib/public-data";
 import { computeHeatmap } from "@/app/(site)/(private)/utils";
 
@@ -14,6 +15,7 @@ import { HomeStatsBar }   from "@/components/home/HomeStatsBar";
 import { HomeTicker }     from "@/components/home/HomeTicker";
 import { HomeWriting }    from "@/components/home/HomeWriting";
 import { HomeDiary }      from "@/components/home/HomeDiary";
+import { HomeActivityFeed } from "@/components/home/HomeActivityFeed";
 import { HomeProjects }   from "@/components/home/HomeProjects";
 import { HomeIdeas }      from "@/components/home/HomeIdeas";
 import { HomeObsession }  from "@/components/home/HomeObsession";
@@ -34,30 +36,54 @@ export default async function HomePage() {
   const projectsToShow = activeProjects.slice(0, 5);
 
   // ── Supabase (dynamic, request-time) ─────────────────
-  const [diaryEntries, streak, ideas, ideasStats] = await Promise.all([
-    getPublicDiaryEntries(4),
+  const [diaryEntries, streak, ideas, ideasStats, totalWords] = await Promise.all([
+    getPublicDiaryEntries(10), // Fetch up to 10 to gather enough activity logs
     getDiaryStreak(),
-    getPublicIdeas(4),
+    getPublicIdeas(10),       // Fetch up to 10 to gather enough activity logs
     getIdeasStats(),
+    getPublicDiaryWordCount(),
   ]);
 
   // Heatmap from last 182 days of diary entries
   const allDiaryDates = diaryEntries.map(e => e.written_at);
   const heatmapLevels = computeHeatmap(allDiaryDates, 182);
 
+  // Format initial activity logs from diary & ideas database entries
+  const diaryEvents = diaryEntries.map(entry => ({
+    id: `diary-${entry.id}`,
+    type: "diary" as const,
+    timestamp: entry.written_at,
+    text: `DIARY PUBLISHED: "${entry.content.substring(0, 50)}${entry.content.length > 50 ? "..." : ""}" (+${entry.word_count} words)`
+  }));
+
+  const ideaEvents = ideas.map(idea => ({
+    id: `idea-${idea.id}`,
+    type: "idea" as const,
+    timestamp: idea.planted_at,
+    text: `IDEA PLANTED: "${idea.content.substring(0, 50)}${idea.content.length > 50 ? "..." : ""}" (ripeness: ${idea.ripeness})`
+  }));
+
+  const initialEvents = [...diaryEvents, ...ideaEvents]
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, 10);
+
+  // Slice back down to original size for UI grid cards
+  const diaryEntriesToShow = diaryEntries.slice(0, 4);
+
   return (
     <>
       <HomeHero />
-      <HomeStatsBar streak={streak} projectCount={activeProjects.length} />
+      <HomeStatsBar streak={streak} projectCount={activeProjects.length} totalWords={totalWords} />
       <HomeTicker />
       <HomeWriting articles={allArticles} />
       <HomeDiary
-        entries={diaryEntries}
+        entries={diaryEntriesToShow}
         streak={streak}
         heatmapLevels={heatmapLevels}
       />
+      <HomeActivityFeed initialCommits={[]} initialEvents={initialEvents} />
       <HomeProjects projects={projectsToShow} />
-      <HomeIdeas ideas={ideas} stats={ideasStats} />
+      <HomeIdeas ideas={ideas.slice(0, 4)} stats={ideasStats} />
       <HomeObsession />
       <HomeNewsletter />
     </>
