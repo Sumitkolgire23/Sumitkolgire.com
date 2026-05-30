@@ -1,7 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { TiltCard } from "@/components/ui/TiltCard";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getFeatureFlags } from "@/lib/features";
 
 
 type Project = {
@@ -20,12 +24,54 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export function HomeProjects({ projects }: { projects: Project[] }) {
+  // ── Pinned horizontal scroll (feature-flagged) ─────────────────────────
+  useEffect(() => {
+    if (!getFeatureFlags().scrollAnimations) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const track = document.querySelector(".projects-track") as HTMLElement | null;
+    if (!track) return;
+
+    const cards = track.querySelectorAll(".project-card-item");
+    if (cards.length < 2) return; // not enough cards to warrant horizontal scroll
+
+    const totalWidth = track.scrollWidth;
+    const viewWidth = window.innerWidth;
+    const scrollDistance = totalWidth - viewWidth;
+
+    // Only enable on wide screens (≥1024 px)
+    if (scrollDistance <= 0 || viewWidth < 1024) return;
+
+    const ctx = gsap.context(() => {
+      gsap.to(track, {
+        x: () => -scrollDistance,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".projects-section",
+          start: "top top",
+          end: () => `+=${scrollDistance}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   if (projects.length === 0) return null;
 
   const [tall, ...rest] = projects;
 
   return (
-    <section id="projects" className="page-section" style={{ background: "var(--bg)", position: "relative" }}>
+    <section
+      id="projects"
+      className="page-section projects-section"
+      style={{ background: "var(--bg)", position: "relative" }}
+    >
       <div aria-hidden="true" style={{ position: "absolute", fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "200px", color: "rgba(255,255,255,.015)", pointerEvents: "none", userSelect: "none", right: "28px", top: "32px", lineHeight: 1 }}>P</div>
 
       <div className="section-container">
@@ -43,7 +89,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
 
         {/* Projects grid: 2fr 1fr 1fr with tall card spanning 2 rows */}
         <div
-          className="proj-grid"
+          className="proj-grid projects-track"
           style={{
             display: "grid",
             gridTemplateColumns: "2fr 1fr 1fr",
@@ -54,7 +100,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
           }}
         >
           {/* Tall featured project */}
-          <TiltCard className="reveal proj-tall" style={{ gridRow: "span 2" }}>
+          <TiltCard className="reveal proj-tall project-card-item" style={{ gridRow: "span 2" }}>
             <Link
               href={`/projects/${tall.slug}`}
               className="project-aurora-glow"
@@ -102,7 +148,7 @@ export function HomeProjects({ projects }: { projects: Project[] }) {
 
           {/* Remaining projects */}
           {rest.slice(0, 4).map((proj, i) => (
-            <TiltCard key={proj.slug} className={`reveal rd${(i % 2) + 1}`}>
+            <TiltCard key={proj.slug} className={`reveal rd${(i % 2) + 1} project-card-item`}>
               <Link
                 href={`/projects/${proj.slug}`}
                 className="project-aurora-glow"

@@ -1204,3 +1204,16 @@ html.lenis, html.lenis body {
     will-change: auto;
   }
 }
+
+/* Horizontal scroll projects track */
+.projects-track {
+  display: flex;
+  will-change: transform;
+}
+@media (max-width: 1023px) {
+  /* Mobile: disable horizontal scroll, show standard grid */
+  .projects-track {
+    flex-wrap: wrap;
+    will-change: auto;
+  }
+}
