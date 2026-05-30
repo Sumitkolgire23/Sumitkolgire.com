@@ -567,29 +567,64 @@ pre code {
 }
 
 /* ── SIDENOTES ──────────────────────────────────────────── */
+.sidenote-wrapper {
+  position: relative;
+  display: inline;
+}
+
+.sidenote-trigger {
+  background: none;
+  border: none;
+  color: var(--seal);
+  font-family: var(--mono);
+  font-size: 0.75em;
+  font-weight: bold;
+  vertical-align: super;
+  cursor: pointer;
+  padding: 0 2px;
+  display: inline-block;
+  line-height: 1;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sidenote-trigger:hover,
+.sidenote-trigger.active {
+  opacity: 0.8;
+  transform: scale(1.15);
+}
+
 @media (min-width: 1200px) {
   .has-sidenotes { position: relative; }
   .sidenote {
     position: absolute;
     right: -280px;
+    top: 0;
     width: 240px;
     font-size: 0.8rem;
     color: var(--text3);
     line-height: 1.55;
     font-family: var(--sans);
+    display: block !important; /* Always visible on desktop */
   }
 }
+
 @media (max-width: 1199px) {
   .sidenote {
-    display: block;
-    margin: 0.5rem 0 0.5rem 1.5rem;
+    display: none; /* Collapsed by default on mobile */
+    margin: 0.75rem 0 0.75rem 1.5rem;
     padding: 0.5rem 0 0.5rem 0.75rem;
     border-left: 2px solid var(--border2);
     font-size: 0.825rem;
     color: var(--text3);
     line-height: 1.55;
+    animation: ink-fade-in 0.2s ease-out forwards;
+  }
+  
+  .sidenote.open {
+    display: block; /* Expanded when clicked */
   }
 }
+
 
 /* ── DROP CAP ───────────────────────────────────────────── */
 .prose-drop-cap > p:first-of-type::first-letter {
@@ -982,3 +1017,76 @@ html.lenis, html.lenis body {
   transform: scale(1.06);
   box-shadow: 0 0 0 2px var(--seal2);
 }
+
+/* ── READER CONTROLS: PAPER MODE ── */
+[data-paper="true"] {
+  --bg: #1c1815;       /* Warm-toned deep charcoal instead of cold black */
+  --bg2: #211c18;
+  --bg3: #2a241f;
+  --bg4: #332b25;
+  --border: #3d322c;
+  --text: #fdfaf2;     /* Warm near-white */
+  --text2: #f0e6da;    /* Soft warm cream for body copy */
+  --text3: #c2b09e;    /* Warm beige metadata */
+}
+
+[data-paper="true"] .prose-wabi {
+  filter: sepia(0.08);
+}
+
+[data-paper="true"] .prose-wabi p,
+[data-paper="true"] .prose-wabi li {
+  line-height: 1.95;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ── READER CONTROLS: FOCUS SPOTLIGHT MODE ── */
+[data-focus="true"] .prose-wabi p {
+  opacity: 0.18;
+  transition: opacity 0.25s ease-out;
+}
+
+[data-focus="true"] .prose-wabi p[data-focus-active="true"] {
+  opacity: 1;
+}
+
+[data-focus="true"] .prose-wabi h2,
+[data-focus="true"] .prose-wabi h3 {
+  opacity: 0.5;
+  transition: opacity 0.25s ease-out;
+}
+
+/* ── Floating Controls Panel Hover Hint ── */
+.reader-controls-panel .reader-shortcuts-hint {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92) translateY(5px);
+}
+
+.reader-controls-panel:hover .reader-shortcuts-hint {
+  opacity: 1;
+  pointer-events: all;
+  transform: scale(1) translateY(0);
+}
+
+/* ── SHIKI SYNTAX HIGHLIGHTING OVERRIDES ── */
+.prose-wabi pre.shiki {
+  background: var(--bg2) !important;
+  border: 1px solid var(--border) !important;
+  padding: 1.25em 1.5em;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.prose-wabi pre.shiki code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
+
