@@ -96,7 +96,7 @@ export default function RootLayout({
           patternScale={3.5}
           patternDensity={0.9}
           pixelSizeJitter={0.5}
-          enableRipples={true}
+          enableRipples={false}
           rippleSpeed={0.4}
           rippleThickness={0.12}
           rippleIntensityScale={1.5}
