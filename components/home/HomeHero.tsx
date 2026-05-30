@@ -7,12 +7,14 @@ import { TypedIdentity } from "@/components/home/TypedIdentity";
 import { NeuralHero3D } from "@/components/home/NeuralHero3D";
 import SplitType from "split-type";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getFeatureFlags } from "@/lib/features";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { GlowCard } from "@/components/ui/GlowCard";
 
 export function HomeHero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const el = titleRef.current;
@@ -145,14 +147,51 @@ export function HomeHero() {
       "-=0.3"
     );
 
+    // ── Parallax depth layers ────────────────────────────────────────────
+    // Register ScrollTrigger (safe to call multiple times)
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Aurora background moves at ~30% of scroll speed (depth layer)
+    const parallaxAurora = gsap.to(
+      heroRef.current?.querySelector(".aurora-wrap") as Element,
+      {
+        y: "30%",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      }
+    );
+
+    // Hero text column moves at ~15% of scroll speed (slower exit)
+    const parallaxText = gsap.to(
+      heroRef.current?.querySelector(".hero-text-col") as Element,
+      {
+        y: "15%",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      }
+    );
+
     return () => {
       tl.kill();
       split.revert();
+      parallaxAurora.kill();
+      parallaxText.kill();
     };
   }, []);
 
   return (
     <section
+      ref={heroRef}
       id="hero"
       style={{
         minHeight: "90vh",
@@ -166,8 +205,9 @@ export function HomeHero() {
         background: "var(--bg)",
       }}
     >
-      {/* Ambient glow */}
+      {/* Ambient glow — aurora-wrap for parallax targeting */}
       <div
+        className="aurora-wrap"
         aria-hidden="true"
         style={{
           position: "absolute",
@@ -202,7 +242,7 @@ export function HomeHero() {
       </div>
 
       {/* ── LEFT ──────────────────────────────────────── */}
-      <div style={{ position: "relative", zIndex: 2 }}>
+      <div className="hero-text-col" style={{ position: "relative", zIndex: 2 }}>
         {/* Overline */}
         <div
           className="reveal-overline"

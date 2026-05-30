@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/*
+ * ──────────────────────────────────────────────────────────
+ * CASCADE LAYER ARCHITECTURE
+ * ──────────────────────────────────────────────────────────
+ * Custom layer names are site-prefixed to avoid conflicts
+ * with Tailwind v4's built-in base / components / utilities.
+ *
+ * Layer precedence (low → high within our custom layers):
+ *   site-tokens     — CSS custom properties (:root)
+ *   site-base       — html, body, resets, grain, cursor
+ *   site-components — named component classes
+ *   site-utilities  — single-purpose helpers (highest)
+ *
+ * @keyframes are declared at root level — they are global
+ * and do not participate in the cascade layer system.
+ * ──────────────────────────────────────────────────────────
+ */
+@layer site-tokens, site-base, site-components, site-utilities;
+
 /* ══════════════════════════════════════════════════════════
    DARK THEME DESIGN SYSTEM — Neural Dark Edition
    Core philosophy: imperfection-as-intention. Silence as design.
@@ -7,67 +26,69 @@
    ══════════════════════════════════════════════════════════ */
 
 /* ── CSS CUSTOM PROPERTIES ─────────────────────────────── */
-:root {
-  /* Dark backgrounds */
-  --bg:      #0d0d0e;
-  --bg2:     #111113;
-  --bg3:     #161618;
-  --bg4:     #1c1c1f;
-  --bg5:     #202024;
+@layer site-tokens {
+  :root {
+    /* Dark backgrounds */
+    --bg:      #0d0d0e;
+    --bg2:     #111113;
+    --bg3:     #161618;
+    --bg4:     #1c1c1f;
+    --bg5:     #202024;
 
-  /* Borders */
-  --border:  #2a2a2e;
-  --border2: #36363c;
-  --border3: #444449;
+    /* Borders */
+    --border:  #2a2a2e;
+    --border2: #36363c;
+    --border3: #444449;
 
-  /* Text — maximum contrast, always readable on dark backgrounds */
-  --text:    #f8f5f0;   /* true near-white with warm tint — headings, labels */
-  --text2:   #dedad2;  /* strong readable — body copy, descriptions */
-  --text3:   #a8a49e;  /* legible muted — metadata, tags, dates */
-  --text4:   #706c68;  /* visible subtle — ghost labels, placeholders */
+    /* Text — maximum contrast, always readable on dark backgrounds */
+    --text:    #f8f5f0;   /* true near-white with warm tint — headings, labels */
+    --text2:   #dedad2;  /* strong readable — body copy, descriptions */
+    --text3:   #a8a49e;  /* legible muted — metadata, tags, dates */
+    --text4:   #706c68;  /* visible subtle — ghost labels, placeholders */
 
-  /* Accent colors */
-  --seal:    #c41e3a;
-  --seal2:   rgba(196, 30, 58, 0.12);
-  --seal3:   rgba(196, 30, 58, 0.06);
-  --gold:    #c8a96e;
-  --gold2:   rgba(200, 169, 110, 0.1);
-  --moss:    #3d8b3a;
-  --moss2:   rgba(61, 139, 58, 0.12);
-  --sky:     #4a9eff;
-  --sky2:    rgba(74, 158, 255, 0.1);
-  --amber:   #e8924a;
+    /* Accent colors */
+    --seal:    #c41e3a;
+    --seal2:   rgba(196, 30, 58, 0.12);
+    --seal3:   rgba(196, 30, 58, 0.06);
+    --gold:    #c8a96e;
+    --gold2:   rgba(200, 169, 110, 0.1);
+    --moss:    #3d8b3a;
+    --moss2:   rgba(61, 139, 58, 0.12);
+    --sky:     #4a9eff;
+    --sky2:    rgba(74, 158, 255, 0.1);
+    --amber:   #e8924a;
 
-  /* Legacy aliases used by existing components */
-  --ink:        var(--text);   /* = #f2efe9 */
-  --ink-2:      var(--text2);  /* = #ccc8c0 */
-  --ink-mid:    var(--text2);  /* ← was text3; now readable body colour */
-  --ink-faint:  var(--border);
-  --ink-light:  var(--text3);  /* = #8a8680 */
-  --muted:      var(--text3);
-  --ghost:      var(--text4);
-  --paper:      var(--bg);
-  --paper-2:    var(--bg2);
-  --paper-3:    var(--bg3);
-  --washi:      var(--bg2);
-  --gold-warm:  var(--gold);
-  --teal:       var(--sky);
-  --teal-light: var(--sky2);
-  --cyan:       var(--sky);
-  --warn:       #b45309;
-  --danger:     #b91c1c;
-  --ok:         #15803d;
-  --paper-light: var(--bg2);
+    /* Legacy aliases used by existing components */
+    --ink:        var(--text);
+    --ink-2:      var(--text2);
+    --ink-mid:    var(--text2);
+    --ink-faint:  var(--border);
+    --ink-light:  var(--text3);
+    --muted:      var(--text3);
+    --ghost:      var(--text4);
+    --paper:      var(--bg);
+    --paper-2:    var(--bg2);
+    --paper-3:    var(--bg3);
+    --washi:      var(--bg2);
+    --gold-warm:  var(--gold);
+    --teal:       var(--sky);
+    --teal-light: var(--sky2);
+    --cyan:       var(--sky);
+    --warn:       #b45309;
+    --danger:     #b91c1c;
+    --ok:         #15803d;
+    --paper-light: var(--bg2);
 
-  /* Typography */
-  --serif:   'Instrument Serif', Georgia, serif;
-  --mono:    'Geist Mono', 'Courier New', monospace;
-  --sans:    'Geist', system-ui, sans-serif;
-  --display: 'Instrument Serif', Georgia, serif;
+    /* Typography */
+    --serif:   'Instrument Serif', Georgia, serif;
+    --mono:    'Geist Mono', 'Courier New', monospace;
+    --sans:    'Geist', system-ui, sans-serif;
+    --display: 'Instrument Serif', Georgia, serif;
 
-  /* Spacing */
-  --content-width: 75ch;
-  --site-width: 1100px;
+    /* Spacing */
+    --content-width: 75ch;
+    --site-width: 1100px;
+  }
 }
 
 /* ── BASE RESET ────────────────────────────────────────── */
@@ -428,57 +449,63 @@ pre code {
   100% { opacity: 1; filter: blur(0); transform: translateY(0); }
 }
 
-/* ── LAYOUT UTILITIES ───────────────────────────────────── */
-.page-section {
-  padding: 80px 40px;
-  position: relative;
-}
-@media (max-width: 1100px) {
-  .page-section { padding: 60px 28px; }
-}
-@media (max-width: 680px) {
-  .page-section { padding: 48px 20px; }
-}
+/* ── LAYOUT UTILITIES & RESPONSIVE HELPERS ───────────────
+   Wrapped in site-utilities layer so these single-purpose
+   helpers can be overridden by specific component styles
+   when needed (utility layer has highest precedence).
+   ────────────────────────────────────────────────────────── */
+@layer site-utilities {
+  .page-section {
+    padding: 80px 40px;
+    position: relative;
+  }
+  @media (max-width: 1100px) {
+    .page-section { padding: 60px 28px; }
+  }
+  @media (max-width: 680px) {
+    .page-section { padding: 48px 20px; }
+  }
 
-.section-container {
-  max-width: var(--site-width);
-  margin: 0 auto;
-  width: 100%;
-}
+  .section-container {
+    max-width: var(--site-width);
+    margin: 0 auto;
+    width: 100%;
+  }
 
-/* ── HIDDEN / SHOW MOBILE ───────────────────────────────── */
-.hidden-mobile { display: none !important; }
-@media (min-width: 640px) {
-  .hidden-mobile { display: flex !important; }
-}
-.show-mobile { display: flex !important; }
-@media (min-width: 640px) {
-  .show-mobile { display: none !important; }
-}
+  /* ── VISIBILITY UTILITIES ─────────────────────────────── */
+  .hidden-mobile { display: none !important; }
+  @media (min-width: 640px) {
+    .hidden-mobile { display: flex !important; }
+  }
+  .show-mobile { display: flex !important; }
+  @media (min-width: 640px) {
+    .show-mobile { display: none !important; }
+  }
 
-/* ── GRID UTILITIES ─────────────────────────────────────── */
-.grid-responsive-3 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-}
-@media (min-width: 640px) {
-  .grid-responsive-3 { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 1024px) {
-  .grid-responsive-3 { grid-template-columns: repeat(3, 1fr); }
-}
+  /* ── GRID UTILITIES ──────────────────────────────────── */
+  .grid-responsive-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  @media (min-width: 640px) {
+    .grid-responsive-3 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .grid-responsive-3 { grid-template-columns: repeat(3, 1fr); }
+  }
 
-.grid-responsive-2 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-@media (min-width: 640px) {
-  .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
-}
+  .grid-responsive-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
+  }
+} /* end @layer site-utilities */
 
 /* ── PROSE WABI (MDX) ───────────────────────────────────── */
 .prose-wabi {
@@ -1164,4 +1191,16 @@ html.lenis, html.lenis body {
 }
 @media (max-width: 1200px) {
   .section-rail { display: none; }
+}
+
+/* Parallax performance � promote to GPU composite layer */
+.aurora-wrap,
+.hero-text-col {
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-wrap,
+  .hero-text-col {
+    will-change: auto;
+  }
 }
