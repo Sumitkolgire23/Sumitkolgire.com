@@ -57,3 +57,6 @@ Documentation/
 
 # Scratch directory
 /scratch
+
+*storybook.log
+storybook-static
