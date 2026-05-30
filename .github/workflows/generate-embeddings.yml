@@ -1,0 +1,35 @@
+name: Generate Content Embeddings
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Run at 2:00 AM daily
+  workflow_dispatch: # Enable manual run from GitHub UI
+
+jobs:
+  build-and-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile Velite cache
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: "https://sumitkolgire.com"
+
+      - name: Run embeddings generator
+        run: npx tsx scripts/generate-embeddings.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

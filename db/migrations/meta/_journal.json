@@ -15,6 +15,20 @@
       "when": 1780075753766,
       "tag": "0001_loose_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780087121674,
+      "tag": "0002_tan_natasha_romanoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780128699131,
+      "tag": "0003_zippy_scalphunter",
+      "breakpoints": true
     }
   ]
 }
