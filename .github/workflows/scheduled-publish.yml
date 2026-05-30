@@ -1,0 +1,14 @@
+name: Scheduled Publish
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Run every hour
+  workflow_dispatch: # Enable manual triggering
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Publish API
+        run: |
+          curl -X POST "https://sumitkolgire.com/api/publish" -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

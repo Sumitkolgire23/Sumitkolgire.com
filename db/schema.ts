@@ -7,6 +7,7 @@ import {
   integer,
   jsonb,
   index,
+  vector,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -162,3 +163,42 @@ export const usersRelations = relations(users, ({ many }) => ({
 export const diaryEntriesRelations = relations(diaryEntries, ({ one }) => ({
   user: one(users, { fields: [diaryEntries.userId], references: [users.id] }),
 }));
+
+// ── CONTENT EMBEDDINGS ────────────────────────────────────────────────────────
+// Vector search chunks and embeddings for articles, projects, diaries, ideas
+export const contentEmbeddings = pgTable(
+  "content_embeddings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contentId: text("content_id").notNull(),       // e.g. "articles/hello-this-is-my-lab"
+    contentType: text("content_type").notNull(),   // "article" | "perspective" | "project" | "diary"
+    chunkIndex: integer("chunk_index").notNull(),
+    chunkContent: text("chunk_content").notNull(),
+    embedding: vector("embedding", { dimensions: 384 }).notNull(), // 384 dims for all-MiniLM-L6-v2
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    contentIdIdx: index("embeddings_content_id_idx").on(t.contentId),
+  })
+);
+
+
+// ── SCHEDULED POSTS ───────────────────────────────────────────────────────────
+// Posts scheduled to be published in the future
+export const scheduledPosts = pgTable(
+  "scheduled_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sanityDocId: text("sanity_doc_id").notNull(),
+    publishAt: timestamp("publish_at").notNull(),
+    status: text("status").default("pending").notNull(), // 'pending' | 'published' | 'failed'
+    contentType: text("content_type").notNull(), // 'article' | 'perspective'
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    publishAtIdx: index("scheduled_posts_publish_at_idx").on(t.publishAt),
+    statusIdx: index("scheduled_posts_status_idx").on(t.status),
+  })
+);
+
+
